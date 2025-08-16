@@ -1,0 +1,380 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ================== USERS & ROLES ==================
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  roleName    String   @unique @db.VarChar(50)
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users User[]
+
+  @@map("roles")
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique @db.VarChar(255)
+  password      String    @db.VarChar(255)
+  fullName      String    @db.VarChar(100)
+  avatar        String?   @db.VarChar(500)
+  dateOfBirth   DateTime?
+  gender        String?   @db.VarChar(10)
+  phoneNumber   String?   @db.VarChar(20)
+  address       String?   @db.Text
+  isActive      Boolean   @default(true)
+  emailVerified Boolean   @default(false)
+  roleId        Int
+  status        String    @default("active")
+  codeId        String?
+  codeExpired   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  role               Role                     @relation(fields: [roleId], references: [id])
+  examAttempts       ExamAttempt[]
+  userLearningPaths  UserLearningPath[]
+  blogPosts          BlogPost[]
+  blogComments       BlogComment[]
+  vocabularyProgress UserVocabularyProgress[]
+  grammarProgress    UserGrammarProgress[]
+  // favorites       UserFavorite[]
+
+  @@map("users")
+}
+
+// ================== EXAMS & TESTS ==================
+
+model Exam {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(200)
+  description String?  @db.Text
+  duration    Int // Duration in minutes
+  difficulty  String   @db.VarChar(20) // "Easy", "Medium", "Hard"
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  questions    Question[]
+  examAttempts ExamAttempt[]
+
+  @@map("exams")
+}
+
+model Question {
+  id           Int      @id @default(autoincrement())
+  examId       Int
+  content      String   @db.Text
+  questionType String   @db.VarChar(50) // "MultipleChoice", "FillInBlank", etc.
+  orderIndex   Int // Order of question in exam
+  points       Float    @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  exam           Exam            @relation(fields: [examId], references: [id], onDelete: Cascade)
+  answerOptions  AnswerOption[]
+  aiExplanations AIExplanation[]
+
+  @@map("questions")
+}
+
+model AnswerOption {
+  id          Int      @id @default(autoincrement())
+  questionId  Int
+  content     String   @db.Text
+  isCorrect   Boolean  @default(false)
+  optionLabel String   @db.VarChar(1) // A, B, C, D
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("answer_options")
+}
+
+model ExamAttempt {
+  id             Int       @id @default(autoincrement())
+  userId         Int
+  examId         Int
+  score          Float?
+  totalQuestions Int
+  correctAnswers Int       @default(0)
+  timeSpent      Int? // Time spent in seconds
+  status         String    @default("InProgress") @db.VarChar(20) // "InProgress", "Completed", "Cancelled"
+  detailedResult Json? // Store detailed answers
+  startedAt      DateTime  @default(now())
+  completedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user           User            @relation(fields: [userId], references: [id])
+  exam           Exam            @relation(fields: [examId], references: [id])
+  aiExplanations AIExplanation[]
+
+  @@map("exam_attempts")
+}
+
+// ================== VOCABULARY ==================
+
+model VocabularyTopic {
+  id          Int      @id @default(autoincrement())
+  topicName   String   @db.VarChar(100)
+  description String?  @db.Text
+  image       String?  @db.VarChar(500)
+  orderIndex  Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  vocabularies Vocabulary[]
+
+  @@map("vocabulary_topics")
+}
+
+model Vocabulary {
+  id                Int      @id @default(autoincrement())
+  topicId           Int
+  englishWord       String   @db.VarChar(100)
+  pronunciation     String?  @db.VarChar(100)
+  vietnameseMeaning String   @db.Text
+  wordType          String?  @db.VarChar(50) // "Noun", "Verb", "Adjective", etc.
+  difficultyLevel   String   @default("Easy") @db.VarChar(20)
+  image             String?  @db.VarChar(500)
+  audioFile         String?  @db.VarChar(500)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  topic        VocabularyTopic          @relation(fields: [topicId], references: [id])
+  examples     VocabularyExample[]
+  userProgress UserVocabularyProgress[]
+
+  @@map("vocabularies")
+}
+
+model VocabularyExample {
+  id                 Int      @id @default(autoincrement())
+  vocabularyId       Int
+  englishSentence    String   @db.Text
+  vietnameseSentence String   @db.Text
+  audioFile          String?  @db.VarChar(500)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  vocabulary Vocabulary @relation(fields: [vocabularyId], references: [id], onDelete: Cascade)
+
+  @@map("vocabulary_examples")
+}
+
+// ================== GRAMMAR ==================
+
+model Grammar {
+  id              Int      @id @default(autoincrement())
+  title           String   @db.VarChar(200)
+  content         String   @db.Text
+  difficultyLevel String   @default("Easy") @db.VarChar(20)
+  orderIndex      Int      @default(0)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  examples     GrammarExample[]
+  userProgress UserGrammarProgress[]
+
+  @@map("grammar")
+}
+
+model GrammarExample {
+  id                 Int      @id @default(autoincrement())
+  grammarId          Int
+  englishSentence    String   @db.Text
+  vietnameseSentence String   @db.Text
+  explanation        String?  @db.Text
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  grammar Grammar @relation(fields: [grammarId], references: [id], onDelete: Cascade)
+
+  @@map("grammar_examples")
+}
+
+// ================== LEARNING PATHS ==================
+
+model LearningPath {
+  id             Int      @id @default(autoincrement())
+  pathName       String   @db.VarChar(200)
+  description    String?  @db.Text
+  coverImage     String?  @db.VarChar(500)
+  targetLevel    String   @db.VarChar(50) // "Beginner", "Intermediate", "Advanced"
+  estimatedWeeks Int? // Estimated weeks to complete
+  orderIndex     Int      @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  pathSteps         PathStep[]
+  userLearningPaths UserLearningPath[]
+
+  @@map("learning_paths")
+}
+
+model PathStep {
+  id               Int      @id @default(autoincrement())
+  learningPathId   Int
+  stepName         String   @db.VarChar(200)
+  description      String?  @db.Text
+  contentType      String   @db.VarChar(50) // "Vocabulary", "Grammar", "Exam", "Video"
+  contentId        Int? // ID of related content
+  orderIndex       Int
+  isRequired       Boolean  @default(true)
+  estimatedMinutes Int? // Estimated minutes to complete
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  learningPath LearningPath @relation(fields: [learningPathId], references: [id], onDelete: Cascade)
+
+  @@map("path_steps")
+}
+
+model UserLearningPath {
+  id             Int       @id @default(autoincrement())
+  userId         Int
+  learningPathId Int
+  status         String    @default("InProgress") @db.VarChar(20) // "InProgress", "Completed", "Paused"
+  progress       Json? // Store progress for each step
+  startedAt      DateTime  @default(now())
+  completedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id])
+  learningPath LearningPath @relation(fields: [learningPathId], references: [id])
+
+  @@unique([userId, learningPathId])
+  @@map("user_learning_paths")
+}
+
+// ================== BLOG ==================
+
+model BlogCategory {
+  id           Int      @id @default(autoincrement())
+  categoryName String   @db.VarChar(100)
+  description  String?  @db.Text
+  slug         String   @unique @db.VarChar(150)
+  orderIndex   Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  blogPosts BlogPost[]
+
+  @@map("blog_categories")
+}
+
+model BlogPost {
+  id             Int       @id @default(autoincrement())
+  title          String    @db.VarChar(300)
+  slug           String    @unique @db.VarChar(350)
+  excerpt        String?   @db.Text
+  content        String    @db.Text
+  featuredImage  String?   @db.VarChar(500)
+  authorId       Int
+  categoryId     Int
+  status         String    @default("Draft") @db.VarChar(20) // "Draft", "Published", "Archived"
+  viewCount      Int       @default(0)
+  seoKeywords    String?   @db.VarChar(300)
+  seoDescription String?   @db.VarChar(500)
+  publishedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  author   User          @relation(fields: [authorId], references: [id])
+  category BlogCategory  @relation(fields: [categoryId], references: [id])
+  comments BlogComment[]
+
+  @@map("blog_posts")
+}
+
+model BlogComment {
+  id              Int      @id @default(autoincrement())
+  blogPostId      Int
+  userId          Int
+  content         String   @db.Text
+  parentCommentId Int? // For nested comments
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  blogPost      BlogPost      @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id])
+  parentComment BlogComment?  @relation("NestedComments", fields: [parentCommentId], references: [id])
+  childComments BlogComment[] @relation("NestedComments")
+
+  @@map("blog_comments")
+}
+
+// ================== USER PROGRESS TRACKING ==================
+
+model UserVocabularyProgress {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  vocabularyId    Int
+  status          String    @default("Learning") @db.VarChar(20) // "Learning", "Mastered", "NeedsReview"
+  masteryLevel    Int       @default(0) // 0-100 percentage
+  timesPracticed  Int       @default(0)
+  lastPracticedAt DateTime?
+  firstLearnedAt  DateTime  @default(now())
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user       User       @relation(fields: [userId], references: [id])
+  vocabulary Vocabulary @relation(fields: [vocabularyId], references: [id])
+
+  @@unique([userId, vocabularyId])
+  @@map("user_vocabulary_progress")
+}
+
+model UserGrammarProgress {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  grammarId       Int
+  status          String    @default("Learning") @db.VarChar(20) // "Learning", "Mastered", "NeedsReview"
+  masteryLevel    Int       @default(0) // 0-100 percentage
+  timesPracticed  Int       @default(0)
+  lastPracticedAt DateTime?
+  firstLearnedAt  DateTime  @default(now())
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id])
+  grammar Grammar @relation(fields: [grammarId], references: [id])
+
+  @@unique([userId, grammarId])
+  @@map("user_grammar_progress")
+}
+
+model AIExplanation {
+  id            Int      @id @default(autoincrement())
+  examAttemptId Int
+  questionId    Int
+  explanation   String   @db.Text // Giải thích từ AI
+  createdAt     DateTime @default(now())
+
+  examAttempt ExamAttempt @relation(fields: [examAttemptId], references: [id], onDelete: Cascade)
+  question    Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("ai_explanations")
+}
