@@ -11,11 +11,7 @@ export class AuthDTO {
 
   @IsString()
   @IsOptional()
-  firstName?: string;
-
-  @IsString()
-  @IsOptional()
-  lastName?: string;
+  fullName?: string;
 }
 
 export class LoginDTO {

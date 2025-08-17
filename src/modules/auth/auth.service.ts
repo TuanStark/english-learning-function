@@ -22,7 +22,7 @@ export class AuthService {
   ) {}
 
   async register(dto: AuthDTO) {
-    const { email, password, firstName, lastName } = dto;
+    const { email, password, fullName } = dto;
 
     // Kiểm tra email đã tồn tại chưa
     const existingUser = await this.prisma.user.findUnique({
@@ -42,9 +42,8 @@ export class AuthService {
         data: {
           email,
           password: hash,
-          firstName: firstName || '',
-          lastName: lastName || '',
-          role: "USER",
+          fullName: fullName || '',
+          roleId: 1,
           status: "unactive",
           codeId: codeId,
           codeExpired: dayjs().add(1, 'minute').toDate(),
@@ -56,7 +55,7 @@ export class AuthService {
         subject: 'Activate your account at @movieTix',
         template: 'register',
         context: {
-          name: user.firstName ?? user.lastName ?? user.email,
+          name: user.fullName,
           activationCode: codeId,
         },
       });
@@ -156,9 +155,12 @@ export class AuthService {
   }
 
   async validateJwtUser(userId: number) {
-    const user = await this.userService.findOne(userId);
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { role: true },
+    });
     if (!user) throw new UnauthorizedException('User not found!');
-    const currentUser: CurrentUser = { id: user.id, role: user.role };
+    const currentUser: CurrentUser = { id: user.id, role: user.role.roleName };
     return currentUser;
   }
 

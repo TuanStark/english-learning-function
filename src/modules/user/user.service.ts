@@ -71,9 +71,13 @@ export class UserService {
     return this.prisma.user.findUnique({
       where: { id },
       include: {
-        bookings: true,
-        articles: true,
-        movieReviews: true,
+        role: true,
+        examAttempts: true,
+        userLearningPaths: true,
+        blogPosts: true,
+        blogComments: true,
+        vocabularyProgress: true,
+        grammarProgress: true,
       }
     });
   }
