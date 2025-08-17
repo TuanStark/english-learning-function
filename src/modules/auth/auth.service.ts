@@ -23,8 +23,6 @@ export class AuthService {
 
   async register(dto: AuthDTO) {
     const { email, password, fullName } = dto;
-
-    // Kiểm tra email đã tồn tại chưa
     const existingUser = await this.prisma.user.findUnique({
       where: { email },
     });
@@ -33,7 +31,6 @@ export class AuthService {
       throw new ForbiddenException('Email already in use');
     }
 
-    // Hash mật khẩu
     const hash = await argon.hash(password);
     const codeId = uuidv4();
 ;    // Tạo user
@@ -43,16 +40,15 @@ export class AuthService {
           email,
           password: hash,
           fullName: fullName || '',
-          roleId: 1,
+          roleId: 4,
           status: "unactive",
           codeId: codeId,
           codeExpired: dayjs().add(1, 'minute').toDate(),
         },
       });
-
       this.mailerService.sendMail({
         to: user.email,
-        subject: 'Activate your account at @movieTix',
+        subject: 'Activate your account at @EnglishMaster',
         template: 'register',
         context: {
           name: user.fullName,

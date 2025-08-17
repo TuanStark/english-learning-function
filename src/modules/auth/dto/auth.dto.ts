@@ -1,17 +1,15 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class AuthDTO {
-  @IsEmail()
-  @IsNotEmpty()
+  @IsEmail({}, { message: 'Email không hợp lệ' })
   email: string;
 
-  @IsString()
-  @IsNotEmpty()
-  password: string;
+  @IsString({ message: 'Mật khẩu phải là chuỗi' })
+  @MinLength(6, { message: 'Mật khẩu phải dài ít nhất 6 ký tự' })
+  password: string; // Đảm bảo là 'password', không phải 'pasword'
 
-  @IsString()
-  @IsOptional()
-  fullName?: string;
+  @IsString({ message: 'Tên đầy đủ phải là chuỗi' })
+  fullName: string; // Nếu request body có fullName
 }
 
 export class LoginDTO {

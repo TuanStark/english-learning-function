@@ -13,16 +13,14 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
         });
     }
 
-    async validate(email: string, password: string): Promise<any> {
+    async validate(email: string, password: string): Promise<any> {        
         if (!email || !password) {
             throw new BadRequestException('Email and password are required');
         }
-        
         const user = await this.authService.validateUser(email, password);
         if (!user) {
             throw new UnauthorizedException('Invalid credentials');
         }
-        
         if(user.status !== 'active') {
             throw new BadRequestException('Account not active');
         }

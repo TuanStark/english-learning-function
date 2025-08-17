@@ -22,10 +22,9 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  async register(@Body() createAuthDto: AuthDTO) {
+  async register(@Req() request: Request,@Body() createAuthDto: AuthDTO) {
     try {
       const user = await this.authService.register(createAuthDto);
-      console.log('User created successfully:', user);
       return new ResponseData(user, HttpStatus.CREATED, HttpMessage.CREATED);
     } catch (error) {
       if (error instanceof ForbiddenException) {
@@ -86,25 +85,23 @@ export class AuthController {
     }
   }
 
-  @UseGuards(LocalAuthGuard)
-  @Post('login')
-  async login(@Req() req: any) {
-    try {
-      // LocalAuthGuard đã validate user, user info có trong req.user
-      const user = req.user;
-      const response = await this.authService.login(user);
-      
-      return new ResponseData(response, HttpStatus.SUCCESS, HttpMessage.SUCCESS);
-    } catch (error) {
-      return new ResponseData(
-        null,
-        HttpStatus.UNAUTHORIZED,
-        HttpMessage.INVALID_CREDENTIALS
-      );
+    @UseGuards(LocalAuthGuard)
+    @Post('login')
+    async login(@Req() req: any) {
+      try {
+        // LocalAuthGuard đã validate user, user info có trong req.user
+        const user = req.user;
+        const response = await this.authService.login(user);
+        
+        return new ResponseData(response, HttpStatus.SUCCESS, HttpMessage.SUCCESS);
+      } catch (error) {
+        return new ResponseData(
+          null,
+          HttpStatus.UNAUTHORIZED,
+          HttpMessage.INVALID_CREDENTIALS
+        );
+      }
     }
-  }
-
-
 
   @Post('refresh')
   @HttpCode(NestHttpStatus.OK)
