@@ -11,6 +11,21 @@ import { VocabulariesModule } from './modules/vocabularies/vocabularies.module';
 import { UserVocabulariesProgressModule } from './modules/user-vocabularies-progress/user-vocabularies-progress.module';
 import { VocabularyTopicModule } from './modules/vocabulary-topic/vocabulary-topic.module';
 import { VocabularyExampleModule } from './modules/vocabulary-example/vocabulary-example.module';
+import { RoleModule } from './modules/role/role.module';
+import { ExamModule } from './modules/exam/exam.module';
+import { QuestionModule } from './modules/question/question.module';
+import { AnswerOptionModule } from './modules/answer-option/answer-option.module';
+import { GrammarModule } from './modules/grammar/grammar.module';
+import { BlogCategoryModule } from './modules/blog-category/blog-category.module';
+import { ExamAttemptModule } from './modules/exam-attempt/exam-attempt.module';
+import { GrammarExampleModule } from './modules/grammar-example/grammar-example.module';
+import { UserGrammarProgressModule } from './modules/user-grammar-progress/user-grammar-progress.module';
+import { AIExplanationModule } from './modules/ai-explanation/ai-explanation.module';
+import { BlogPostModule } from './modules/blog-post/blog-post.module';
+import { BlogCommentModule } from './modules/blog-comment/blog-comment.module';
+import { LearningPathModule } from './modules/learning-path/learning-path.module';
+import { PathStepModule } from './modules/path-step/path-step.module';
+import { UserLearningPathModule } from './modules/user-learning-path/user-learning-path.module';
 @Module({
   imports: [
     MailerModule.forRootAsync({
@@ -50,6 +65,21 @@ import { VocabularyExampleModule } from './modules/vocabulary-example/vocabulary
     UserVocabulariesProgressModule,
     VocabularyTopicModule,
     VocabularyExampleModule,
+    RoleModule,
+    ExamModule,
+    QuestionModule,
+    AnswerOptionModule,
+    GrammarModule,
+    BlogCategoryModule,
+    ExamAttemptModule,
+    GrammarExampleModule,
+    UserGrammarProgressModule,
+    AIExplanationModule,
+    BlogPostModule,
+    BlogCommentModule,
+    LearningPathModule,
+    PathStepModule,
+    UserLearningPathModule,
   ],
   controllers: [AppController],
   providers: [],
