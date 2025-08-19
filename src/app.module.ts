@@ -7,6 +7,10 @@ import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { VocabulariesModule } from './modules/vocabularies/vocabularies.module';
+import { UserVocabulariesProgressModule } from './modules/user-vocabularies-progress/user-vocabularies-progress.module';
+import { VocabularyTopicModule } from './modules/vocabulary-topic/vocabulary-topic.module';
+import { VocabularyExampleModule } from './modules/vocabulary-example/vocabulary-example.module';
 @Module({
   imports: [
     MailerModule.forRootAsync({
@@ -41,7 +45,11 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     AuthModule,
     UserModule,
     PrismaModule,
-    CloudinaryModule, 
+    CloudinaryModule,
+    VocabulariesModule,
+    UserVocabulariesProgressModule,
+    VocabularyTopicModule,
+    VocabularyExampleModule,
   ],
   controllers: [AppController],
   providers: [],

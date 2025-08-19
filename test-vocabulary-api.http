@@ -1,0 +1,154 @@
+### Test Vocabulary API Endpoints
+### Sử dụng với REST Client extension trong VS Code
+
+### 1. Tạo Vocabulary Topic
+POST http://localhost:8001/vocabulary-topics
+Content-Type: application/json
+
+{
+  "topicName": "Family & Relationships",
+  "description": "Từ vựng về gia đình và các mối quan hệ",
+  "image": "https://example.com/family.jpg",
+  "orderIndex": 1,
+  "isActive": true
+}
+
+### 2. Lấy danh sách Vocabulary Topics
+GET http://localhost:8001/vocabulary-topics
+
+### 3. Lấy chi tiết Vocabulary Topic
+GET http://localhost:8001/vocabulary-topics/1
+
+### 4. Lấy thống kê Vocabulary Topic
+GET http://localhost:8001/vocabulary-topics/1/stats
+
+### 5. Tạo Vocabulary
+POST http://localhost:8001/vocabularies
+Content-Type: application/json
+
+{
+  "topicId": 1,
+  "englishWord": "family",
+  "pronunciation": "/ˈfæməli/",
+  "vietnameseMeaning": "gia đình",
+  "wordType": "Noun",
+  "difficultyLevel": "Easy",
+  "image": "https://example.com/family.jpg",
+  "audioFile": "https://example.com/family.mp3",
+  "isActive": true
+}
+
+### 6. Lấy danh sách Vocabularies
+GET http://localhost:8001/vocabularies
+
+### 7. Lấy Vocabularies theo topic
+GET http://localhost:8001/vocabularies?topicId=1
+
+### 9. Lấy Vocabularies theo topic ID
+GET http://localhost:8001/vocabularies/topic/1
+
+### 10. Lấy chi tiết Vocabulary
+GET http://localhost:8001/vocabularies/1
+
+### 11. Tạo Vocabulary Example
+POST http://localhost:8001/vocabulary-examples
+Content-Type: application/json
+
+{
+  "vocabularyId": 1,
+  "englishSentence": "My family is very important to me.",
+  "vietnameseSentence": "Gia đình tôi rất quan trọng với tôi.",
+  "audioFile": "https://example.com/family-example.mp3"
+}
+
+### 12. Lấy danh sách Vocabulary Examples
+GET http://localhost:8001/vocabulary-examples
+
+### 13. Lấy Examples theo vocabulary
+GET http://localhost:8001/vocabulary-examples/vocabulary/1
+
+### 14. Tạo User Vocabulary Progress
+POST http://localhost:8001/user-vocabularies-progress
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "vocabularyId": 1,
+  "status": "Learning",
+  "masteryLevel": 0,
+  "timesPracticed": 0
+}
+
+### 15. Lấy danh sách User Vocabulary Progress
+GET http://localhost:8001/user-vocabularies-progress
+
+### 16. Lấy Progress theo user
+GET http://localhost:8001/user-vocabularies-progress/user/1
+
+### 17. Lấy thống kê user
+GET http://localhost:8001/user-vocabularies-progress/user/1/stats
+
+### 18. Cập nhật Progress sau luyện tập (trả lời đúng)
+POST http://localhost:8001/user-vocabularies-progress/practice
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "vocabularyId": 1,
+  "practiceResult": true
+}
+
+### 19. Cập nhật Progress sau luyện tập (trả lời sai)
+POST http://localhost:8001/user-vocabularies-progress/practice
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "vocabularyId": 1,
+  "practiceResult": false
+}
+
+### 20. Cập nhật Vocabulary Topic
+PATCH http://localhost:8001/vocabulary-topics/1
+Content-Type: application/json
+
+{
+  "description": "Từ vựng về gia đình và các mối quan hệ - Cập nhật"
+}
+
+### 21. Cập nhật Vocabulary
+PATCH http://localhost:8001/vocabularies/1
+Content-Type: application/json
+
+{
+  "difficultyLevel": "Medium"
+}
+
+### 22. Cập nhật Vocabulary Example
+PATCH http://localhost:8001/vocabulary-examples/1
+Content-Type: application/json
+
+{
+  "englishSentence": "My family means everything to me."
+}
+
+### 23. Cập nhật User Vocabulary Progress
+PATCH http://localhost:8001/user-vocabularies-progress/1
+Content-Type: application/json
+
+{
+  "masteryLevel": 85,
+  "status": "Mastered"
+}
+
+### 24. Xóa Vocabulary Example
+DELETE http://localhost:8001/vocabulary-examples/1
+
+### 25. Xóa User Vocabulary Progress
+DELETE http://localhost:8001/user-vocabularies-progress/1
+
+### 26. Xóa Vocabulary
+DELETE http://localhost:8001/vocabularies/1
+
+### 27. Xóa Vocabulary Topic
+DELETE http://localhost:8001/vocabulary-topics/1
