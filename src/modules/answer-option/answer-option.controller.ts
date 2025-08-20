@@ -8,11 +8,15 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { AnswerOptionService } from './answer-option.service';
 import { CreateAnswerOptionDto } from './dto/create-answer-option.dto';
 import { UpdateAnswerOptionDto } from './dto/update-answer-option.dto';
+import { FindAllAnswerOptionDto } from './dto/find-all-answer-option.dto';
+import { ResponseData } from 'src/common/global/globalClass';
+import { HttpMessage } from 'src/common/global/globalEnum';
 
 @ApiTags('Answer Options')
 @Controller('answer-options')
@@ -25,8 +29,13 @@ export class AnswerOptionController {
     status: 201,
     description: 'Đáp án đã được tạo thành công',
   })
-  create(@Body() createAnswerOptionDto: CreateAnswerOptionDto) {
-    return this.answerOptionService.create(createAnswerOptionDto);
+  async create(@Body() createAnswerOptionDto: CreateAnswerOptionDto) {
+    try {
+      const result = await this.answerOptionService.create(createAnswerOptionDto);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get()
@@ -41,9 +50,13 @@ export class AnswerOptionController {
     status: 200,
     description: 'Danh sách đáp án',
   })
-  findAll(@Query('questionId') questionId?: string) {
-    const questionIdNumber = questionId ? parseInt(questionId, 10) : undefined;
-    return this.answerOptionService.findAll(questionIdNumber);
+  async findAll(@Query() query: FindAllAnswerOptionDto) {
+    try {
+      const result = await this.answerOptionService.findAll(query);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get('question/:questionId')
@@ -52,8 +65,13 @@ export class AnswerOptionController {
     status: 200,
     description: 'Danh sách đáp án của câu hỏi',
   })
-  findByQuestion(@Param('questionId', ParseIntPipe) questionId: number) {
-    return this.answerOptionService.findByQuestion(questionId);
+  async findByQuestion(@Param('questionId', ParseIntPipe) questionId: number) {
+    try {
+      const result = await this.answerOptionService.findByQuestion(questionId);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get('question/:questionId/correct')
@@ -62,8 +80,13 @@ export class AnswerOptionController {
     status: 200,
     description: 'Danh sách đáp án đúng',
   })
-  getCorrectAnswers(@Param('questionId', ParseIntPipe) questionId: number) {
-    return this.answerOptionService.getCorrectAnswers(questionId);
+  async getCorrectAnswers(@Param('questionId', ParseIntPipe) questionId: number) {
+    try {
+      const result = await this.answerOptionService.getCorrectAnswers(questionId);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get(':id')
@@ -76,8 +99,13 @@ export class AnswerOptionController {
     status: 404,
     description: 'Không tìm thấy đáp án',
   })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.answerOptionService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.answerOptionService.findOne(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Patch(':id')
@@ -90,11 +118,16 @@ export class AnswerOptionController {
     status: 404,
     description: 'Không tìm thấy đáp án',
   })
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateAnswerOptionDto: UpdateAnswerOptionDto,
   ) {
-    return this.answerOptionService.update(id, updateAnswerOptionDto);
+      try {
+      const result = await this.answerOptionService.update(id, updateAnswerOptionDto);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Delete(':id')
@@ -107,7 +140,12 @@ export class AnswerOptionController {
     status: 404,
     description: 'Không tìm thấy đáp án',
   })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.answerOptionService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.answerOptionService.remove(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 }
