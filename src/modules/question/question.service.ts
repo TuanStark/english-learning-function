@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
+import { FindAllQuestionDto } from './dto/find-all-question.dto';
 
 @Injectable()
 export class QuestionService {
@@ -32,34 +33,95 @@ export class QuestionService {
     });
   }
 
-  async findAll(examId?: number, questionType?: string) {
+  async findAll(query: FindAllQuestionDto ) {
+    const {
+      page = 1,
+      limit = 10,
+      search = '',
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      examId,
+      questionType
+    } = query;
+
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+
+    if (pageNumber < 1 || limitNumber < 1) {
+      throw new Error('Page and limit must be greater than 0');
+    }
+
+    const take = limitNumber;
+    const skip = (pageNumber - 1) * take;
+
     const where: any = {};
     
+    // Add search filters
+    if (search && search.trim()) {
+      where.OR = [
+        { content: { contains: search.trim() } },
+        { questionType: { contains: search.trim() } },
+      ];
+    }
+    
+    // Add examId filter
     if (examId) {
       where.examId = examId;
     }
     
+    // Add questionType filter
     if (questionType) {
       where.questionType = questionType;
     }
 
-    return this.prisma.question.findMany({
-      where,
-      include: {
-        exam: {
-          select: {
-            id: true,
-            title: true,
-            difficulty: true,
+    const orderBy = {
+      [sortBy]: sortOrder
+    };
+
+    const [questions, total] = await Promise.all([
+      this.prisma.question.findMany({
+        where: where,
+        orderBy: orderBy,
+        skip,
+        take,
+        include: {
+          exam: {
+            select: {
+              id: true,
+              title: true,
+              difficulty: true,
+            }
           },
-        },
-        answerOptions: true,
+          answerOptions: {
+            select: {
+              id: true,
+              content: true,
+              isCorrect: true,
+              optionLabel: true,
+            }
+          },
+          _count: {
+            select: {
+              answerOptions: true,
+              aiExplanations: true,
+            }
+          }
+        }
+      }),
+      this.prisma.question.count({
+        where: where,
+      })
+    ]);
+
+    return {
+      data: questions,
+      meta: {
+        total,
+        pageNumber,
+        limitNumber,
+        totalPages: Math.ceil(total / limitNumber),
       },
-      orderBy: [
-        { examId: 'asc' },
-        { orderIndex: 'asc' },
-      ],
-    });
+    };
   }
 
   async findOne(id: number) {

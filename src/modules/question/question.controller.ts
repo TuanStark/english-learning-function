@@ -8,11 +8,15 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { QuestionService } from './question.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
+import { FindAllQuestionDto } from './dto/find-all-question.dto';
+import { ResponseData } from 'src/common/global/globalClass';
+import { HttpMessage } from 'src/common/global/globalEnum';
 
 @ApiTags('Questions')
 @Controller('questions')
@@ -25,8 +29,13 @@ export class QuestionController {
     status: 201,
     description: 'Câu hỏi đã được tạo thành công',
   })
-  create(@Body() createQuestionDto: CreateQuestionDto) {
-    return this.questionService.create(createQuestionDto);
+  async create(@Body() createQuestionDto: CreateQuestionDto) {
+    try {
+      const result = await this.questionService.create(createQuestionDto);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get()
@@ -47,12 +56,8 @@ export class QuestionController {
     status: 200,
     description: 'Danh sách câu hỏi',
   })
-  findAll(
-    @Query('examId') examId?: string,
-    @Query('questionType') questionType?: string,
-  ) {
-    const examIdNumber = examId ? parseInt(examId, 10) : undefined;
-    return this.questionService.findAll(examIdNumber, questionType);
+  findAll(@Query() query: FindAllQuestionDto) {
+    return this.questionService.findAll(query);
   }
 
   @Get('exam/:examId')
@@ -61,8 +66,13 @@ export class QuestionController {
     status: 200,
     description: 'Danh sách câu hỏi của bài kiểm tra',
   })
-  findByExam(@Param('examId', ParseIntPipe) examId: number) {
-    return this.questionService.findByExam(examId);
+  async findByExam(@Param('examId', ParseIntPipe) examId: number) {
+    try {
+      const result = await this.questionService.findByExam(examId);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get(':id')
@@ -75,8 +85,13 @@ export class QuestionController {
     status: 404,
     description: 'Không tìm thấy câu hỏi',
   })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.questionService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.questionService.findOne(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get(':id/stats')
@@ -85,8 +100,13 @@ export class QuestionController {
     status: 200,
     description: 'Thống kê câu hỏi',
   })
-  getStats(@Param('id', ParseIntPipe) id: number) {
-    return this.questionService.getQuestionStats(id);
+  async getStats(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.questionService.getQuestionStats(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Patch(':id')
@@ -99,11 +119,16 @@ export class QuestionController {
     status: 404,
     description: 'Không tìm thấy câu hỏi',
   })
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateQuestionDto: UpdateQuestionDto,
   ) {
-    return this.questionService.update(id, updateQuestionDto);
+    try {
+      const result = await this.questionService.update(id, updateQuestionDto);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Delete(':id')
@@ -116,7 +141,12 @@ export class QuestionController {
     status: 404,
     description: 'Không tìm thấy câu hỏi',
   })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.questionService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.questionService.remove(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 }
