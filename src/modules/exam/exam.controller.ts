@@ -13,6 +13,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { ExamService } from './exam.service';
 import { CreateExamDto } from './dto/create-exam.dto';
 import { UpdateExamDto } from './dto/update-exam.dto';
+import { FindAllExamDto } from './dto/find-all-exam.dto';
 
 @ApiTags('Exams')
 @Controller('exams')
@@ -47,12 +48,8 @@ export class ExamController {
     status: 200,
     description: 'Danh sách bài kiểm tra',
   })
-  findAll(
-    @Query('difficulty') difficulty?: string,
-    @Query('includeInactive') includeInactive?: string,
-  ) {
-    const includeInactiveBoolean = includeInactive === 'true';
-    return this.examService.findAll(difficulty, includeInactiveBoolean);
+  findAll(@Query() query: FindAllExamDto) {
+    return this.examService.findAll(query);
   }
 
   @Get('active')

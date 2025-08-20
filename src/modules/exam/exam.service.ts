@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateExamDto } from './dto/create-exam.dto';
 import { UpdateExamDto } from './dto/update-exam.dto';
+import { FindAllExamDto } from './dto/find-all-exam.dto';
 
 @Injectable()
 export class ExamService {
@@ -25,42 +26,99 @@ export class ExamService {
     });
   }
 
-  async findAll(difficulty?: string, includeInactive = false) {
+  async findAll(query: FindAllExamDto) {
+    const {
+      page = 1,
+      limit = 10,
+      search = '',
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      difficulty,
+      includeInactive = false
+    } = query;
+
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+
+    if (pageNumber < 1 || limitNumber < 1) {
+      throw new Error('Page and limit must be greater than 0');
+    }
+
+    const take = limitNumber;
+    const skip = (pageNumber - 1) * take;
+
     const where: any = {};
     
-    if (!includeInactive) {
-      where.isActive = true;
+    // Add search filters
+    if (search && search.trim()) {
+      where.OR = [
+        { title: { contains: search.trim() } },
+        { description: { contains: search.trim() } },
+        { difficulty: { contains: search.trim() } },
+      ];
     }
     
+    // Add difficulty filter
     if (difficulty) {
       where.difficulty = difficulty;
     }
+    
+    // Add active filter
+    if (!includeInactive) {
+      where.isActive = true;
+    }
 
-    return this.prisma.exam.findMany({
-      where,
-      include: {
-        questions: {
-          select: {
-            id: true,
-            content: true,
-            questionType: true,
-            points: true,
+    const orderBy = {
+      [sortBy]: sortOrder
+    };
+
+    const [exams, total] = await Promise.all([
+      this.prisma.exam.findMany({
+        where: where,
+        orderBy: orderBy,
+        skip,
+        take,
+        include: {
+          questions: {
+            select: {
+              id: true,
+              content: true,
+              questionType: true,
+              orderIndex: true,
+              points: true,
+            }
           },
-        },
-        examAttempts: {
-          select: {
-            id: true,
-            userId: true,
-            score: true,
-            status: true,
-            completedAt: true,
+          examAttempts: {
+            select: {
+              id: true,
+              score: true,
+              status: true,
+              startedAt: true,
+              completedAt: true,
+            }
           },
-        },
+          _count: {
+            select: {
+              questions: true,
+              examAttempts: true,
+            }
+          }
+        }
+      }),
+      this.prisma.exam.count({
+        where: where,
+      })
+    ]);
+
+    return {
+      data: exams,
+      meta: {
+        total,
+        pageNumber,
+        limitNumber,
+        totalPages: Math.ceil(total / limitNumber),
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    };
   }
 
   async findOne(id: number) {
