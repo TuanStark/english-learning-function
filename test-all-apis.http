@@ -4,7 +4,7 @@
 ### ==================== ROLE MANAGEMENT ====================
 
 ### 1. Tạo Role
-POST http://localhost:3000/roles
+POST http://localhost:8001/roles
 Content-Type: application/json
 
 {
@@ -13,18 +13,18 @@ Content-Type: application/json
 }
 
 ### 2. Lấy danh sách Roles
-GET http://localhost:3000/roles
+GET http://localhost:8001/roles
 
 ### 3. Lấy chi tiết Role
-GET http://localhost:3000/roles/1
+GET http://localhost:8001/roles/1
 
 ### 4. Lấy thống kê Role
-GET http://localhost:3000/roles/1/stats
+GET http://localhost:8001/roles/1/stats
 
 ### ==================== EXAM MANAGEMENT ====================
 
 ### 5. Tạo Exam
-POST http://localhost:3000/exams
+POST http://localhost:8001/exams
 Content-Type: application/json
 
 {
@@ -36,24 +36,24 @@ Content-Type: application/json
 }
 
 ### 6. Lấy danh sách Exams
-GET http://localhost:3000/exams
+GET http://localhost:8001/exams
 
 ### 7. Lấy Exams theo difficulty
-GET http://localhost:3000/exams?difficulty=Easy
+GET http://localhost:8001/exams?difficulty=Easy
 
 ### 8. Lấy Active Exams
-GET http://localhost:3000/exams/active
+GET http://localhost:8001/exams/active
 
 ### 9. Lấy chi tiết Exam
-GET http://localhost:3000/exams/1
+GET http://localhost:8001/exams/1
 
 ### 10. Lấy thống kê Exam
-GET http://localhost:3000/exams/1/stats
+GET http://localhost:8001/exams/1/stats
 
 ### ==================== QUESTION MANAGEMENT ====================
 
 ### 11. Tạo Question
-POST http://localhost:3000/questions
+POST http://localhost:8001/questions
 Content-Type: application/json
 
 {
@@ -65,21 +65,21 @@ Content-Type: application/json
 }
 
 ### 12. Lấy danh sách Questions
-GET http://localhost:3000/questions
+GET http://localhost:8001/questions
 
 ### 13. Lấy Questions theo Exam
-GET http://localhost:3000/questions/exam/1
+GET http://localhost:8001/questions/exam/1
 
 ### 14. Lấy chi tiết Question
-GET http://localhost:3000/questions/1
+GET http://localhost:8001/questions/1
 
 ### 15. Lấy thống kê Question
-GET http://localhost:3000/questions/1/stats
+GET http://localhost:8001/questions/1/stats
 
 ### ==================== ANSWER OPTION MANAGEMENT ====================
 
 ### 16. Tạo Answer Option
-POST http://localhost:3000/answer-options
+POST http://localhost:8001/answer-options
 Content-Type: application/json
 
 {
@@ -90,7 +90,7 @@ Content-Type: application/json
 }
 
 ### 17. Tạo Answer Option sai
-POST http://localhost:3000/answer-options
+POST http://localhost:8001/answer-options
 Content-Type: application/json
 
 {
@@ -101,18 +101,18 @@ Content-Type: application/json
 }
 
 ### 18. Lấy danh sách Answer Options
-GET http://localhost:3000/answer-options
+GET http://localhost:8001/answer-options
 
 ### 19. Lấy Answer Options theo Question
-GET http://localhost:3000/answer-options/question/1
+GET http://localhost:8001/answer-options/question/1
 
 ### 20. Lấy đáp án đúng của Question
-GET http://localhost:3000/answer-options/question/1/correct
+GET http://localhost:8001/answer-options/question/1/correct
 
 ### ==================== GRAMMAR MANAGEMENT ====================
 
 ### 21. Tạo Grammar
-POST http://localhost:3000/grammar
+POST http://localhost:8001/grammar
 Content-Type: application/json
 
 {
@@ -124,21 +124,21 @@ Content-Type: application/json
 }
 
 ### 22. Lấy danh sách Grammar
-GET http://localhost:3000/grammar
+GET http://localhost:8001/grammar
 
 ### 23. Tìm kiếm Grammar
-GET http://localhost:3000/grammar/search?q=present
+GET http://localhost:8001/grammar/search?q=present
 
 ### 24. Lấy chi tiết Grammar
-GET http://localhost:3000/grammar/1
+GET http://localhost:8001/grammar/1
 
 ### 25. Lấy thống kê Grammar
-GET http://localhost:3000/grammar/1/stats
+GET http://localhost:8001/grammar/1/stats
 
 ### ==================== BLOG CATEGORY MANAGEMENT ====================
 
 ### 26. Tạo Blog Category
-POST http://localhost:3000/blog-categories
+POST http://localhost:8001/blog-categories
 Content-Type: application/json
 
 {
@@ -150,21 +150,21 @@ Content-Type: application/json
 }
 
 ### 27. Lấy danh sách Blog Categories
-GET http://localhost:3000/blog-categories
+GET http://localhost:8001/blog-categories
 
 ### 28. Lấy Blog Category theo slug
-GET http://localhost:3000/blog-categories/slug/english-tips
+GET http://localhost:8001/blog-categories/slug/english-tips
 
 ### 29. Lấy chi tiết Blog Category
-GET http://localhost:3000/blog-categories/1
+GET http://localhost:8001/blog-categories/1
 
 ### 30. Lấy thống kê Blog Category
-GET http://localhost:3000/blog-categories/1/stats
+GET http://localhost:8001/blog-categories/1/stats
 
 ### ==================== VOCABULARY SYSTEM (Existing) ====================
 
 ### 31. Tạo Vocabulary Topic
-POST http://localhost:3000/vocabulary-topics
+POST http://localhost:8001/vocabulary-topics
 Content-Type: application/json
 
 {
@@ -175,7 +175,7 @@ Content-Type: application/json
 }
 
 ### 32. Tạo Vocabulary
-POST http://localhost:3000/vocabularies
+POST http://localhost:8001/vocabularies
 Content-Type: application/json
 
 {
@@ -189,7 +189,7 @@ Content-Type: application/json
 }
 
 ### 33. Tạo Vocabulary Example
-POST http://localhost:3000/vocabulary-examples
+POST http://localhost:8001/vocabulary-examples
 Content-Type: application/json
 
 {
@@ -201,7 +201,7 @@ Content-Type: application/json
 ### ==================== UPDATE OPERATIONS ====================
 
 ### 34. Cập nhật Role
-PATCH http://localhost:3000/roles/1
+PATCH http://localhost:8001/roles/1
 Content-Type: application/json
 
 {
@@ -209,7 +209,7 @@ Content-Type: application/json
 }
 
 ### 35. Cập nhật Exam
-PATCH http://localhost:3000/exams/1
+PATCH http://localhost:8001/exams/1
 Content-Type: application/json
 
 {
@@ -217,7 +217,7 @@ Content-Type: application/json
 }
 
 ### 36. Cập nhật Question
-PATCH http://localhost:3000/questions/1
+PATCH http://localhost:8001/questions/1
 Content-Type: application/json
 
 {
@@ -225,7 +225,7 @@ Content-Type: application/json
 }
 
 ### 37. Cập nhật Grammar
-PATCH http://localhost:3000/grammar/1
+PATCH http://localhost:8001/grammar/1
 Content-Type: application/json
 
 {
@@ -235,18 +235,18 @@ Content-Type: application/json
 ### ==================== DELETE OPERATIONS ====================
 
 ### 38. Xóa Answer Option
-DELETE http://localhost:3000/answer-options/2
+DELETE http://localhost:8001/answer-options/2
 
 ### 39. Xóa Question
-DELETE http://localhost:3000/questions/1
+DELETE http://localhost:8001/questions/1
 
 ### 40. Xóa Exam
-DELETE http://localhost:3000/exams/1
+DELETE http://localhost:8001/exams/1
 
 ### ==================== EXAM ATTEMPT MANAGEMENT ====================
 
 ### 41. Tạo Exam Attempt
-POST http://localhost:3000/exam-attempts
+POST http://localhost:8001/exam-attempts
 Content-Type: application/json
 
 {
@@ -257,16 +257,16 @@ Content-Type: application/json
 }
 
 ### 42. Lấy danh sách Exam Attempts
-GET http://localhost:3000/exam-attempts
+GET http://localhost:8001/exam-attempts
 
 ### 43. Lấy Exam Attempts theo user
-GET http://localhost:3000/exam-attempts/user/1
+GET http://localhost:8001/exam-attempts/user/1
 
 ### 44. Lấy thống kê user
-GET http://localhost:3000/exam-attempts/user/1/stats
+GET http://localhost:8001/exam-attempts/user/1/stats
 
 ### 45. Nộp bài kiểm tra
-POST http://localhost:3000/exam-attempts/1/submit
+POST http://localhost:8001/exam-attempts/1/submit
 Content-Type: application/json
 
 {
@@ -279,7 +279,7 @@ Content-Type: application/json
 ### ==================== GRAMMAR EXAMPLE MANAGEMENT ====================
 
 ### 46. Tạo Grammar Example
-POST http://localhost:3000/grammar-examples
+POST http://localhost:8001/grammar-examples
 Content-Type: application/json
 
 {
@@ -290,21 +290,21 @@ Content-Type: application/json
 }
 
 ### 47. Lấy danh sách Grammar Examples
-GET http://localhost:3000/grammar-examples
+GET http://localhost:8001/grammar-examples
 
 ### 48. Tìm kiếm Grammar Examples
-GET http://localhost:3000/grammar-examples/search?q=school
+GET http://localhost:8001/grammar-examples/search?q=school
 
 ### 49. Lấy Examples theo Grammar
-GET http://localhost:3000/grammar-examples/grammar/1
+GET http://localhost:8001/grammar-examples/grammar/1
 
 ### 50. Lấy chi tiết Grammar Example
-GET http://localhost:3000/grammar-examples/1
+GET http://localhost:8001/grammar-examples/1
 
 ### ==================== USER GRAMMAR PROGRESS MANAGEMENT ====================
 
 ### 51. Tạo User Grammar Progress
-POST http://localhost:3000/user-grammar-progress
+POST http://localhost:8001/user-grammar-progress
 Content-Type: application/json
 
 {
@@ -315,13 +315,13 @@ Content-Type: application/json
 }
 
 ### 52. Lấy danh sách User Grammar Progress
-GET http://localhost:3000/user-grammar-progress
+GET http://localhost:8001/user-grammar-progress
 
 ### 53. Lấy Progress theo user
-GET http://localhost:3000/user-grammar-progress/user/1
+GET http://localhost:8001/user-grammar-progress/user/1
 
 ### 54. Cập nhật Progress sau luyện tập ngữ pháp
-POST http://localhost:3000/user-grammar-progress/practice
+POST http://localhost:8001/user-grammar-progress/practice
 Content-Type: application/json
 
 {
@@ -333,7 +333,7 @@ Content-Type: application/json
 ### ==================== AI EXPLANATION MANAGEMENT ====================
 
 ### 55. Tạo AI Explanation
-POST http://localhost:3000/ai-explanations
+POST http://localhost:8001/ai-explanations
 Content-Type: application/json
 
 {
@@ -343,13 +343,13 @@ Content-Type: application/json
 }
 
 ### 56. Lấy danh sách AI Explanations
-GET http://localhost:3000/ai-explanations
+GET http://localhost:8001/ai-explanations
 
 ### 57. Lấy AI Explanations theo Exam Attempt
-GET http://localhost:3000/ai-explanations/exam-attempt/1
+GET http://localhost:8001/ai-explanations/exam-attempt/1
 
 ### 58. Tự động tạo AI Explanation
-POST http://localhost:3000/ai-explanations/generate
+POST http://localhost:8001/ai-explanations/generate
 Content-Type: application/json
 
 {
@@ -360,7 +360,7 @@ Content-Type: application/json
 ### ==================== BLOG POST MANAGEMENT ====================
 
 ### 59. Tạo Blog Post
-POST http://localhost:3000/blog-posts
+POST http://localhost:8001/blog-posts
 Content-Type: application/json
 
 {
@@ -374,16 +374,16 @@ Content-Type: application/json
 }
 
 ### 60. Lấy danh sách Blog Posts
-GET http://localhost:3000/blog-posts
+GET http://localhost:8001/blog-posts
 
 ### 61. Lấy Blog Posts đã xuất bản
-GET http://localhost:3000/blog-posts/published
+GET http://localhost:8001/blog-posts/published
 
 ### 62. Tìm kiếm Blog Posts
-GET http://localhost:3000/blog-posts/search?q=english
+GET http://localhost:8001/blog-posts/search?q=english
 
 ### 63. Lấy Blog Post theo slug
-GET http://localhost:3000/blog-posts/slug/10-tips-improve-english-speaking-skills
+GET http://localhost:8001/blog-posts/slug/10-tips-improve-english-speaking-skills
 
 ### 64. Lấy thống kê Blog Post
-GET http://localhost:3000/blog-posts/1/stats
+GET http://localhost:8001/blog-posts/1/stats

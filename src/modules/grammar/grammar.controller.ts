@@ -8,11 +8,15 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { GrammarService } from './grammar.service';
 import { CreateGrammarDto } from './dto/create-grammar.dto';
 import { UpdateGrammarDto } from './dto/update-grammar.dto';
+import { FindAllGrammarDto } from './dto/find-all-grammar.dto';
+import { ResponseData } from 'src/common/global/globalClass';
+import { HttpMessage } from 'src/common/global/globalEnum';
 
 @ApiTags('Grammar')
 @Controller('grammar')
@@ -25,8 +29,13 @@ export class GrammarController {
     status: 201,
     description: 'Bài ngữ pháp đã được tạo thành công',
   })
-  create(@Body() createGrammarDto: CreateGrammarDto) {
-    return this.grammarService.create(createGrammarDto);
+  async create(@Body() createGrammarDto: CreateGrammarDto) {
+    try {
+      const result = await this.grammarService.create(createGrammarDto);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get()
@@ -47,12 +56,13 @@ export class GrammarController {
     status: 200,
     description: 'Danh sách bài ngữ pháp',
   })
-  findAll(
-    @Query('difficultyLevel') difficultyLevel?: string,
-    @Query('includeInactive') includeInactive?: string,
-  ) {
-    const includeInactiveBoolean = includeInactive === 'true';
-    return this.grammarService.findAll(difficultyLevel, includeInactiveBoolean);
+  async findAll(@Query() query: FindAllGrammarDto) {
+    try {
+      const result = await this.grammarService.findAll(query);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get('search')
@@ -67,8 +77,13 @@ export class GrammarController {
     status: 200,
     description: 'Kết quả tìm kiếm bài ngữ pháp',
   })
-  search(@Query('q') searchTerm: string) {
-    return this.grammarService.searchGrammar(searchTerm);
+  async search(@Query('q') searchTerm: string) {
+    try {
+      const result = await this.grammarService.searchGrammar(searchTerm);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get(':id')
@@ -81,8 +96,13 @@ export class GrammarController {
     status: 404,
     description: 'Không tìm thấy bài ngữ pháp',
   })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.grammarService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.grammarService.findOne(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get(':id/stats')
@@ -91,8 +111,13 @@ export class GrammarController {
     status: 200,
     description: 'Thống kê bài ngữ pháp',
   })
-  getStats(@Param('id', ParseIntPipe) id: number) {
-    return this.grammarService.getGrammarStats(id);
+  async getStats(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.grammarService.getGrammarStats(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Patch(':id')
@@ -105,11 +130,16 @@ export class GrammarController {
     status: 404,
     description: 'Không tìm thấy bài ngữ pháp',
   })
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateGrammarDto: UpdateGrammarDto,
   ) {
-    return this.grammarService.update(id, updateGrammarDto);
+    try {
+      const result = await this.grammarService.update(id, updateGrammarDto);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Delete(':id')
@@ -122,7 +152,12 @@ export class GrammarController {
     status: 404,
     description: 'Không tìm thấy bài ngữ pháp',
   })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.grammarService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.grammarService.remove(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 }
