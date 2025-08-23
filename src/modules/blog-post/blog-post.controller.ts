@@ -8,11 +8,15 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { BlogPostService } from './blog-post.service';
 import { CreateBlogPostDto } from './dto/create-blog-post.dto';
 import { UpdateBlogPostDto } from './dto/update-blog-post.dto';
+import { ResponseData } from 'src/common/global/globalClass';
+import { HttpMessage } from 'src/common/global/globalEnum';
+import { FindAllDto } from 'src/common/global/find-all.dto';
 
 @ApiTags('Blog Posts')
 @Controller('blog-posts')
@@ -29,8 +33,13 @@ export class BlogPostController {
     status: 409,
     description: 'Slug đã tồn tại',
   })
-  create(@Body() createBlogPostDto: CreateBlogPostDto) {
-    return this.blogPostService.create(createBlogPostDto);
+  async create(@Body() createBlogPostDto: CreateBlogPostDto) {
+    try {
+      const result = await this.blogPostService.create(createBlogPostDto);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get()
@@ -57,14 +66,13 @@ export class BlogPostController {
     status: 200,
     description: 'Danh sách bài viết blog',
   })
-  findAll(
-    @Query('categoryId') categoryId?: string,
-    @Query('authorId') authorId?: string,
-    @Query('status') status?: string,
-  ) {
-    const categoryIdNumber = categoryId ? parseInt(categoryId, 10) : undefined;
-    const authorIdNumber = authorId ? parseInt(authorId, 10) : undefined;
-    return this.blogPostService.findAll(categoryIdNumber, authorIdNumber, status);
+  async findAll(@Query() query: FindAllDto) {
+    try {
+      const result = await this.blogPostService.findAll(query);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get('published')
@@ -73,8 +81,13 @@ export class BlogPostController {
     status: 200,
     description: 'Danh sách bài viết đã xuất bản',
   })
-  findPublished() {
-    return this.blogPostService.findPublished();
+  async findPublished() {
+    try {
+      const result = await this.blogPostService.findPublished();
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get('search')
@@ -89,8 +102,13 @@ export class BlogPostController {
     status: 200,
     description: 'Kết quả tìm kiếm bài viết',
   })
-  search(@Query('q') searchTerm: string) {
-    return this.blogPostService.searchPosts(searchTerm);
+  async search(@Query('q') searchTerm: string) {
+    try {
+      const result = await this.blogPostService.searchPosts(searchTerm);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get('slug/:slug')
@@ -103,8 +121,13 @@ export class BlogPostController {
     status: 404,
     description: 'Không tìm thấy bài viết',
   })
-  findBySlug(@Param('slug') slug: string) {
-    return this.blogPostService.findBySlug(slug);
+  async findBySlug(@Param('slug') slug: string) {
+    try {
+      const result = await this.blogPostService.findBySlug(slug);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get(':id')
@@ -117,8 +140,13 @@ export class BlogPostController {
     status: 404,
     description: 'Không tìm thấy bài viết',
   })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.blogPostService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.blogPostService.findOne(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get(':id/stats')
@@ -127,8 +155,13 @@ export class BlogPostController {
     status: 200,
     description: 'Thống kê bài viết',
   })
-  getStats(@Param('id', ParseIntPipe) id: number) {
-    return this.blogPostService.getPostStats(id);
+  async getStats(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.blogPostService.getPostStats(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Patch(':id')
@@ -145,11 +178,16 @@ export class BlogPostController {
     status: 409,
     description: 'Slug đã tồn tại',
   })
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateBlogPostDto: UpdateBlogPostDto,
   ) {
-    return this.blogPostService.update(id, updateBlogPostDto);
+    try {
+      const result = await this.blogPostService.update(id, updateBlogPostDto);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Delete(':id')
@@ -162,7 +200,12 @@ export class BlogPostController {
     status: 404,
     description: 'Không tìm thấy bài viết',
   })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.blogPostService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.blogPostService.remove(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 }

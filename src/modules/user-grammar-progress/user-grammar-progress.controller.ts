@@ -126,9 +126,10 @@ export class UserGrammarProgressController {
     status: 200,
     description: 'Tiến độ đã được cập nhật',
   })
-  async   updateProgress(
+  async updateProgress(
     @Body() body: { userId: number; grammarId: number; practiceResult: boolean },
   ) {
+    console.log(body);
     try {
       const result = await this.userGrammarProgressService.updateProgress(
         body.userId,
