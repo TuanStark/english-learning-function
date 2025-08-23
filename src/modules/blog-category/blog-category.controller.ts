@@ -8,11 +8,15 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { BlogCategoryService } from './blog-category.service';
 import { CreateBlogCategoryDto } from './dto/create-blog-category.dto';
 import { UpdateBlogCategoryDto } from './dto/update-blog-category.dto';
+import { ResponseData } from 'src/common/global/globalClass';
+import { HttpMessage } from 'src/common/global/globalEnum';
+import { FindAllDto } from 'src/common/global/find-all.dto';
 
 @ApiTags('Blog Categories')
 @Controller('blog-categories')
@@ -29,25 +33,58 @@ export class BlogCategoryController {
     status: 409,
     description: 'Slug đã tồn tại',
   })
-  create(@Body() createBlogCategoryDto: CreateBlogCategoryDto) {
-    return this.blogCategoryService.create(createBlogCategoryDto);
+  async create(@Body() createBlogCategoryDto: CreateBlogCategoryDto) {
+    try {
+      const result = await this.blogCategoryService.create(createBlogCategoryDto);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get()
   @ApiOperation({ summary: 'Lấy danh sách danh mục blog' })
   @ApiQuery({
-    name: 'includeInactive',
+    name: 'page',
     required: false,
-    description: 'Bao gồm danh mục không hoạt động',
-    type: Boolean,
+    description: 'Trang hiện tại',
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Số lượng bản ghi trên mỗi trang',
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Từ khóa tìm kiếm',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    description: 'Trường sắp xếp',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'sortOrder',
+    required: false,
+    description: 'Thứ tự sắp xếp',
+    type: String,
   })
   @ApiResponse({
     status: 200,
     description: 'Danh sách danh mục blog',
   })
-  findAll(@Query('includeInactive') includeInactive?: string) {
-    const includeInactiveBoolean = includeInactive === 'true';
-    return this.blogCategoryService.findAll(includeInactiveBoolean);
+  async findAll(@Query() query: FindAllDto) {
+    try {
+      const result = await this.blogCategoryService.findAll(query);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get('slug/:slug')
@@ -60,8 +97,13 @@ export class BlogCategoryController {
     status: 404,
     description: 'Không tìm thấy danh mục blog',
   })
-  findBySlug(@Param('slug') slug: string) {
-    return this.blogCategoryService.findBySlug(slug);
+  async findBySlug(@Param('slug') slug: string) {
+    try {
+      const result = await this.blogCategoryService.findBySlug(slug);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get(':id')
@@ -74,8 +116,13 @@ export class BlogCategoryController {
     status: 404,
     description: 'Không tìm thấy danh mục blog',
   })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.blogCategoryService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.blogCategoryService.findOne(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get(':id/stats')
@@ -84,8 +131,13 @@ export class BlogCategoryController {
     status: 200,
     description: 'Thống kê danh mục blog',
   })
-  getStats(@Param('id', ParseIntPipe) id: number) {
-    return this.blogCategoryService.getCategoryStats(id);
+  async getStats(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.blogCategoryService.getCategoryStats(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Patch(':id')
@@ -102,11 +154,16 @@ export class BlogCategoryController {
     status: 409,
     description: 'Slug đã tồn tại',
   })
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateBlogCategoryDto: UpdateBlogCategoryDto,
   ) {
-    return this.blogCategoryService.update(id, updateBlogCategoryDto);
+    try {
+      const result = await this.blogCategoryService.update(id, updateBlogCategoryDto);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Delete(':id')
@@ -123,7 +180,12 @@ export class BlogCategoryController {
     status: 409,
     description: 'Không thể xóa danh mục đang có bài viết',
   })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.blogCategoryService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.blogCategoryService.remove(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 }

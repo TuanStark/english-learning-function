@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateBlogCategoryDto } from './dto/create-blog-category.dto';
 import { UpdateBlogCategoryDto } from './dto/update-blog-category.dto';
+import { FindAllDto } from 'src/common/global/find-all.dto';
 
 @Injectable()
 export class BlogCategoryService {
@@ -32,28 +33,58 @@ export class BlogCategoryService {
     });
   }
 
-  async findAll(includeInactive = false) {
-    const where = includeInactive ? {} : { isActive: true };
+  async findAll(query: FindAllDto) {
+    const {
+      page = 1,
+      limit = 10,
+      search = '',
+      sortBy = 'createdAt',
+      sortOrder = 'asc',
+    } = query;
+
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+
+    if (pageNumber < 1 || limitNumber < 1) {
+      throw new Error('Page and limit must be greater than 0');
+    }
+
+    const take = limitNumber;
+    const skip = (pageNumber - 1) * take;
+
+    const where: any = {};
     
-    return this.prisma.blogCategory.findMany({
-      where,
-      include: {
-        blogPosts: {
-          where: { status: 'Published' },
-          select: {
-            id: true,
-            title: true,
-            slug: true,
-            excerpt: true,
-            publishedAt: true,
-            viewCount: true,
-          },
-        },
+    // Add search filters
+    if (search && search.trim()) {
+      where.OR = [
+        { title: { contains: search.trim() } }
+      ];
+    }
+    const orderBy = {
+      [sortBy]: sortOrder
+    };
+
+    const [grammars, total] = await Promise.all([
+      this.prisma.blogCategory.findMany({
+        where: where,
+        orderBy: orderBy,
+        skip,
+        take,
+      }),
+      this.prisma.blogCategory.count({
+        where: where,
+      })
+    ]);
+
+    return {
+      data: grammars,
+      meta: {
+        total,
+        pageNumber,
+        limitNumber,
+        totalPages: Math.ceil(total / limitNumber),
       },
-      orderBy: {
-        orderIndex: 'asc',
-      },
-    });
+    };
   }
 
   async findOne(id: number) {
