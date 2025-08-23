@@ -8,11 +8,15 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { GrammarExampleService } from './grammar-example.service';
 import { CreateGrammarExampleDto } from './dto/create-grammar-example.dto';
 import { UpdateGrammarExampleDto } from './dto/update-grammar-example.dto';
+import { ResponseData } from 'src/common/global/globalClass';
+import { HttpMessage } from 'src/common/global/globalEnum';
+import { FindAll } from './dto/find-all.dto';
 
 @ApiTags('Grammar Examples')
 @Controller('grammar-examples')
@@ -25,8 +29,13 @@ export class GrammarExampleController {
     status: 201,
     description: 'Ví dụ ngữ pháp đã được tạo thành công',
   })
-  create(@Body() createGrammarExampleDto: CreateGrammarExampleDto) {
-    return this.grammarExampleService.create(createGrammarExampleDto);
+  async create(@Body() createGrammarExampleDto: CreateGrammarExampleDto) {
+    try {
+      const result = await this.grammarExampleService.create(createGrammarExampleDto);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get()
@@ -41,9 +50,13 @@ export class GrammarExampleController {
     status: 200,
     description: 'Danh sách ví dụ ngữ pháp',
   })
-  findAll(@Query('grammarId') grammarId?: string) {
-    const grammarIdNumber = grammarId ? parseInt(grammarId, 10) : undefined;
-    return this.grammarExampleService.findAll(grammarIdNumber);
+  async findAll(@Query() query: FindAll) {
+    try {
+      const result = await this.grammarExampleService.findAll(query);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get('search')
@@ -58,8 +71,13 @@ export class GrammarExampleController {
     status: 200,
     description: 'Kết quả tìm kiếm ví dụ ngữ pháp',
   })
-  search(@Query('q') searchTerm: string) {
-    return this.grammarExampleService.searchExamples(searchTerm);
+  async search(@Query('q') searchTerm: string) {
+    try {
+      const result = await this.grammarExampleService.searchExamples(searchTerm);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get('grammar/:grammarId')
@@ -68,8 +86,13 @@ export class GrammarExampleController {
     status: 200,
     description: 'Danh sách ví dụ của bài ngữ pháp',
   })
-  findByGrammar(@Param('grammarId', ParseIntPipe) grammarId: number) {
-    return this.grammarExampleService.findByGrammar(grammarId);
+  async findByGrammar(@Param('grammarId', ParseIntPipe) grammarId: number) {
+    try {
+      const result = await this.grammarExampleService.findByGrammar(grammarId);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get(':id')
@@ -82,8 +105,13 @@ export class GrammarExampleController {
     status: 404,
     description: 'Không tìm thấy ví dụ ngữ pháp',
   })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.grammarExampleService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.grammarExampleService.findOne(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Patch(':id')
@@ -96,11 +124,16 @@ export class GrammarExampleController {
     status: 404,
     description: 'Không tìm thấy ví dụ ngữ pháp',
   })
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateGrammarExampleDto: UpdateGrammarExampleDto,
   ) {
-    return this.grammarExampleService.update(id, updateGrammarExampleDto);
+    try {
+      const result = await this.grammarExampleService.update(id, updateGrammarExampleDto);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Delete(':id')
@@ -113,7 +146,12 @@ export class GrammarExampleController {
     status: 404,
     description: 'Không tìm thấy ví dụ ngữ pháp',
   })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.grammarExampleService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.grammarExampleService.remove(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 }

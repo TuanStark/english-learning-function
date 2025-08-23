@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateGrammarExampleDto } from './dto/create-grammar-example.dto';
 import { UpdateGrammarExampleDto } from './dto/update-grammar-example.dto';
+import { FindAll } from './dto/find-all.dto';
 
 @Injectable()
 export class GrammarExampleService {
@@ -33,24 +34,88 @@ export class GrammarExampleService {
     });
   }
 
-  async findAll(grammarId?: number) {
-    const where = grammarId ? { grammarId } : {};
+  async findAll(query: FindAll) {
+    const {
+      page = 1,
+      limit = 10,
+      search = '',
+      sortBy = 'createdAt',
+      sortOrder = 'asc',
+      difficultyLevel,
+      grammarId,
+      includeInactive = false
+    } = query;
 
-    return this.prisma.grammarExample.findMany({
-      where,
-      include: {
-        grammar: {
-          select: {
-            id: true,
-            title: true,
-            difficultyLevel: true,
-          },
-        },
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+
+    if (pageNumber < 1 || limitNumber < 1) {
+      throw new Error('Page and limit must be greater than 0');
+    }
+
+    const take = limitNumber;
+    const skip = (pageNumber - 1) * take;
+
+    const where: any = {};
+    
+    // Add search filters for grammar examples
+    if (search && search.trim()) {
+      where.OR = [
+        { englishSentence: { contains: search.trim() } },
+        { vietnameseSentence: { contains: search.trim() } },
+        { grammar: { title: { contains: search.trim() } } },
+      ];
+    }
+    
+    // Add grammarId filter
+    if (grammarId) {
+      where.grammarId = grammarId;
+    }
+    
+    // Add difficultyLevel filter through grammar relation
+    if (difficultyLevel) {
+      where.grammar = {
+        difficultyLevel: difficultyLevel
+      };
+    }
+    
+    // Note: GrammarExample doesn't have isActive field, so includeInactive is not used
+
+    const orderBy = {
+      [sortBy]: sortOrder
+    };
+
+    const [grammarExamples, total] = await Promise.all([
+      this.prisma.grammarExample.findMany({
+        where: where,
+        orderBy: orderBy,
+        skip,
+        take,
+        include: {
+          grammar: {
+            select: {
+              id: true,
+              title: true,
+              difficultyLevel: true,
+              content: true,
+            }
+          }
+        }
+      }),
+      this.prisma.grammarExample.count({
+        where: where,
+      })
+    ]);
+
+    return {
+      data: grammarExamples,
+      meta: {
+        total,
+        pageNumber,
+        limitNumber,
+        totalPages: Math.ceil(total / limitNumber),
       },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    });
+    };
   }
 
   async findOne(id: number) {
