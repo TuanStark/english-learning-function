@@ -8,11 +8,15 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { UserGrammarProgressService } from './user-grammar-progress.service';
 import { CreateUserGrammarProgressDto } from './dto/create-user-grammar-progress.dto';
 import { UpdateUserGrammarProgressDto } from './dto/update-user-grammar-progress.dto';
+import { ResponseData } from 'src/common/global/globalClass';
+import { HttpMessage } from 'src/common/global/globalEnum';
+import { FindAllDto } from 'src/common/global/find-all.dto';
 
 @ApiTags('User Grammar Progress')
 @Controller('user-grammar-progress')
@@ -25,8 +29,13 @@ export class UserGrammarProgressController {
     status: 201,
     description: 'Tiến độ học ngữ pháp đã được tạo thành công',
   })
-  create(@Body() createUserGrammarProgressDto: CreateUserGrammarProgressDto) {
-    return this.userGrammarProgressService.create(createUserGrammarProgressDto);
+  async create(@Body() createUserGrammarProgressDto: CreateUserGrammarProgressDto) {
+    try {
+      const result = await this.userGrammarProgressService.create(createUserGrammarProgressDto);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    } 
   }
 
   @Get()
@@ -53,14 +62,13 @@ export class UserGrammarProgressController {
     status: 200,
     description: 'Danh sách tiến độ học ngữ pháp',
   })
-  findAll(
-    @Query('userId') userId?: string,
-    @Query('grammarId') grammarId?: string,
-    @Query('status') status?: string,
-  ) {
-    const userIdNumber = userId ? parseInt(userId, 10) : undefined;
-    const grammarIdNumber = grammarId ? parseInt(grammarId, 10) : undefined;
-    return this.userGrammarProgressService.findAll(userIdNumber, grammarIdNumber, status);
+  async findAll(@Query() query: FindAllDto) {
+    try {
+      const result = await this.userGrammarProgressService.findAll(query);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get('user/:userId')
@@ -69,8 +77,13 @@ export class UserGrammarProgressController {
     status: 200,
     description: 'Tiến độ học ngữ pháp của người dùng',
   })
-  findByUser(@Param('userId', ParseIntPipe) userId: number) {
-    return this.userGrammarProgressService.findByUser(userId);
+  async findByUser(@Param('userId', ParseIntPipe) userId: number) {
+    try {
+      const result = await this.userGrammarProgressService.findByUser(userId);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get('user/:userId/stats')
@@ -79,8 +92,13 @@ export class UserGrammarProgressController {
     status: 200,
     description: 'Thống kê học ngữ pháp của người dùng',
   })
-  getUserStats(@Param('userId', ParseIntPipe) userId: number) {
-    return this.userGrammarProgressService.getUserStats(userId);
+  async getUserStats(@Param('userId', ParseIntPipe) userId: number) {
+    try {
+      const result = await this.userGrammarProgressService.getUserStats(userId);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get(':id')
@@ -93,8 +111,13 @@ export class UserGrammarProgressController {
     status: 404,
     description: 'Không tìm thấy tiến độ học ngữ pháp',
   })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.userGrammarProgressService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.userGrammarProgressService.findOne(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Post('practice')
@@ -103,14 +126,19 @@ export class UserGrammarProgressController {
     status: 200,
     description: 'Tiến độ đã được cập nhật',
   })
-  updateProgress(
+  async   updateProgress(
     @Body() body: { userId: number; grammarId: number; practiceResult: boolean },
   ) {
-    return this.userGrammarProgressService.updateProgress(
-      body.userId,
-      body.grammarId,
-      body.practiceResult,
-    );
+    try {
+      const result = await this.userGrammarProgressService.updateProgress(
+        body.userId,
+        body.grammarId,
+        body.practiceResult,
+      );
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Patch(':id')
@@ -123,11 +151,16 @@ export class UserGrammarProgressController {
     status: 404,
     description: 'Không tìm thấy tiến độ học ngữ pháp',
   })
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserGrammarProgressDto: UpdateUserGrammarProgressDto,
   ) {
-    return this.userGrammarProgressService.update(id, updateUserGrammarProgressDto);
+    try {
+      const result = await this.userGrammarProgressService.update(id, updateUserGrammarProgressDto);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Delete(':id')
@@ -140,7 +173,12 @@ export class UserGrammarProgressController {
     status: 404,
     description: 'Không tìm thấy tiến độ học ngữ pháp',
   })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.userGrammarProgressService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.userGrammarProgressService.remove(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 }

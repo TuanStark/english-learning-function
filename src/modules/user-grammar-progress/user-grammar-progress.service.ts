@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateUserGrammarProgressDto } from './dto/create-user-grammar-progress.dto';
 import { UpdateUserGrammarProgressDto } from './dto/update-user-grammar-progress.dto';
+import { FindAllDto } from 'src/common/global/find-all.dto';
 
 @Injectable()
 export class UserGrammarProgressService {
@@ -67,43 +68,56 @@ export class UserGrammarProgressService {
     });
   }
 
-  async findAll(userId?: number, grammarId?: number, status?: string) {
-    const where: any = {};
-    
-    if (userId) {
-      where.userId = userId;
-    }
-    
-    if (grammarId) {
-      where.grammarId = grammarId;
-    }
-    
-    if (status) {
-      where.status = status;
+  async findAll(query: FindAllDto) {
+    const {
+      page = 1,
+      limit = 10,
+      search = '',
+      sortBy = 'createdAt',
+      sortOrder = 'asc',
+    } = query;
+
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+
+    if (pageNumber < 1 || limitNumber < 1) {
+      throw new Error('Page and limit must be greater than 0');
     }
 
-    return this.prisma.userGrammarProgress.findMany({
-      where,
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            fullName: true,
-          },
-        },
-        grammar: {
-          select: {
-            id: true,
-            title: true,
-            difficultyLevel: true,
-          },
-        },
+    const take = limitNumber;
+    const skip = (pageNumber - 1) * take;
+
+    const where: any = {};
+
+    const orderBy = {
+      [sortBy]: sortOrder
+    };
+
+    const [grammars, total] = await Promise.all([
+      this.prisma.userGrammarProgress.findMany({
+        where: where,
+        orderBy: orderBy,
+        skip,
+        take,
+        include: {
+          grammar: true,
+          user: true,
+        }
+      }),
+      this.prisma.userGrammarProgress.count({
+        where: where,
+      })
+    ]);
+
+    return {
+      data: grammars,
+      meta: {
+        total,
+        pageNumber,
+        limitNumber,
+        totalPages: Math.ceil(total / limitNumber),
       },
-      orderBy: {
-        updatedAt: 'desc',
-      },
-    });
+    };
   }
 
   async findOne(id: number) {
