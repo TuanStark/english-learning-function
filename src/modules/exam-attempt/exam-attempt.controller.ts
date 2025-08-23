@@ -8,11 +8,15 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { ExamAttemptService } from './exam-attempt.service';
 import { CreateExamAttemptDto } from './dto/create-exam-attempt.dto';
 import { UpdateExamAttemptDto } from './dto/update-exam-attempt.dto';
+import { ResponseData } from 'src/common/global/globalClass';
+import { HttpMessage } from 'src/common/global/globalEnum';
+import { FindAllDto } from 'src/common/global/find-all.dto';
 
 @ApiTags('Exam Attempts')
 @Controller('exam-attempts')
@@ -29,8 +33,13 @@ export class ExamAttemptController {
     status: 409,
     description: 'User đang có bài làm InProgress',
   })
-  create(@Body() createExamAttemptDto: CreateExamAttemptDto) {
-    return this.examAttemptService.create(createExamAttemptDto);
+  async create(@Body() createExamAttemptDto: CreateExamAttemptDto) {
+    try {
+      const result = await this.examAttemptService.create(createExamAttemptDto);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }   
   }
 
   @Get()
@@ -57,14 +66,15 @@ export class ExamAttemptController {
     status: 200,
     description: 'Danh sách lần làm bài',
   })
-  findAll(
-    @Query('userId') userId?: string,
-    @Query('examId') examId?: string,
-    @Query('status') status?: string,
+  async findAll(
+    @Query() query: FindAllDto,
   ) {
-    const userIdNumber = userId ? parseInt(userId, 10) : undefined;
-    const examIdNumber = examId ? parseInt(examId, 10) : undefined;
-    return this.examAttemptService.findAll(userIdNumber, examIdNumber, status);
+    try {
+      const result = await this.examAttemptService.findAll(query);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get('user/:userId')
@@ -73,8 +83,13 @@ export class ExamAttemptController {
     status: 200,
     description: 'Danh sách lần làm bài của người dùng',
   })
-  findByUser(@Param('userId', ParseIntPipe) userId: number) {
-    return this.examAttemptService.findByUser(userId);
+  async findByUser(@Param('userId', ParseIntPipe) userId: number) {
+    try {
+      const result = await this.examAttemptService.findByUser(userId);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get('exam/:examId')
@@ -83,8 +98,13 @@ export class ExamAttemptController {
     status: 200,
     description: 'Danh sách lần làm bài của bài kiểm tra',
   })
-  findByExam(@Param('examId', ParseIntPipe) examId: number) {
-    return this.examAttemptService.findByExam(examId);
+  async findByExam(@Param('examId', ParseIntPipe) examId: number) {
+    try {
+      const result = await this.examAttemptService.findByExam(examId);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get('user/:userId/stats')
@@ -93,8 +113,13 @@ export class ExamAttemptController {
     status: 200,
     description: 'Thống kê làm bài của người dùng',
   })
-  getUserStats(@Param('userId', ParseIntPipe) userId: number) {
-    return this.examAttemptService.getUserExamStats(userId);
+  async getUserStats(@Param('userId', ParseIntPipe) userId: number) {
+    try {
+      const result = await this.examAttemptService.getUserExamStats(userId);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Get(':id')
@@ -107,8 +132,13 @@ export class ExamAttemptController {
     status: 404,
     description: 'Không tìm thấy lần làm bài',
   })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.examAttemptService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.examAttemptService.findOne(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Post(':id/submit')
@@ -121,11 +151,16 @@ export class ExamAttemptController {
     status: 409,
     description: 'Bài kiểm tra không ở trạng thái InProgress',
   })
-  submitExam(
+  async submitExam(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: { answers: any[] },
   ) {
-    return this.examAttemptService.submitExam(id, body.answers);
+    try {
+      const result = await this.examAttemptService.submitExam(id, body.answers);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Patch(':id')
@@ -138,11 +173,16 @@ export class ExamAttemptController {
     status: 404,
     description: 'Không tìm thấy lần làm bài',
   })
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateExamAttemptDto: UpdateExamAttemptDto,
   ) {
-    return this.examAttemptService.update(id, updateExamAttemptDto);
+    try {
+      const result = await this.examAttemptService.update(id, updateExamAttemptDto);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 
   @Delete(':id')
@@ -155,7 +195,12 @@ export class ExamAttemptController {
     status: 404,
     description: 'Không tìm thấy lần làm bài',
   })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.examAttemptService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const result = await this.examAttemptService.remove(id);
+      return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
   }
 }
