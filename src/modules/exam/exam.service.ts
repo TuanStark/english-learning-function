@@ -34,7 +34,8 @@ export class ExamService {
       sortBy = 'createdAt',
       sortOrder = 'desc',
       difficulty,
-      includeInactive = false
+      includeInactive = false,
+      type
     } = query;
 
     const pageNumber = Number(page);
@@ -71,6 +72,12 @@ export class ExamService {
     const orderBy = {
       [sortBy]: sortOrder
     };
+
+    // Add type filter
+    if (type) {
+      where.type = query.type;
+    }
+
 
     const [exams, total] = await Promise.all([
       this.prisma.exam.findMany({

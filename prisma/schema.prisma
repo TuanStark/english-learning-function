@@ -62,6 +62,7 @@ model Exam {
   id          Int      @id @default(autoincrement())
   title       String   @db.VarChar(200)
   description String?  @db.Text
+  type        String?  @default("TOEIC")  
   duration    Int // Duration in minutes
   difficulty  String   @db.VarChar(20) // "Easy", "Medium", "Hard"
   isActive    Boolean  @default(true)

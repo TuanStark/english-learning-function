@@ -16,4 +16,8 @@ export class FindAllExamDto extends FindAllDto {
   })
   @IsBoolean()
   includeInactive?: boolean;
+
+  @IsOptional()
+  @IsString()
+  type?: string;
 }

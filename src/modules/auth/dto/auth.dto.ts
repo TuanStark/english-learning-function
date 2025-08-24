@@ -6,10 +6,10 @@ export class AuthDTO {
 
   @IsString({ message: 'Mật khẩu phải là chuỗi' })
   @MinLength(6, { message: 'Mật khẩu phải dài ít nhất 6 ký tự' })
-  password: string; // Đảm bảo là 'password', không phải 'pasword'
+  password: string;
 
   @IsString({ message: 'Tên đầy đủ phải là chuỗi' })
-  fullName: string; // Nếu request body có fullName
+  fullName: string;
 }
 
 export class LoginDTO {

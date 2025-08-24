@@ -82,6 +82,15 @@ export class UserService {
     });
   }
 
+  async findOneForAuthentication(id: number) {
+    return this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        role: true,
+      }
+    });
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto, file: Express.Multer.File) {
     const existingUser = await this.prisma.user.findUnique({
       where: { id },
