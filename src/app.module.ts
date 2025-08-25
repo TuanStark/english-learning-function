@@ -26,6 +26,7 @@ import { BlogCommentModule } from './modules/blog-comment/blog-comment.module';
 import { LearningPathModule } from './modules/learning-path/learning-path.module';
 import { PathStepModule } from './modules/path-step/path-step.module';
 import { UserLearningPathModule } from './modules/user-learning-path/user-learning-path.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 @Module({
   imports: [
     MailerModule.forRootAsync({
@@ -80,6 +81,7 @@ import { UserLearningPathModule } from './modules/user-learning-path/user-learni
     LearningPathModule,
     PathStepModule,
     UserLearningPathModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [],
