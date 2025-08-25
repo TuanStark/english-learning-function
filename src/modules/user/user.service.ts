@@ -4,12 +4,30 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FindAllDto } from 'src/common/global/find-all.dto';
 import { CloudinaryService } from 'src/modules/cloudinary/cloudinary.service';
+import * as argon from 'argon2';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService,
     private cloudinaryService: CloudinaryService
   ) { }
+
+  async create(createUserDto: CreateUserDto) {
+    const { password, roleId, ...userData } = createUserDto;
+    const hashedPassword = password ? await argon.hash(password) : "123456";
+
+    return this.prisma.user.create({
+      data: {
+        ...userData,
+        password: hashedPassword,
+        role: {
+          connect: {
+            id: roleId
+          }
+        }
+      },
+    });
+  }
 
   async findAll(query: FindAllDto) {
     const {

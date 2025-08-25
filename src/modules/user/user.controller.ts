@@ -22,8 +22,19 @@ export class UserController {
     return this.userService.findOneForAuthentication(req.user.id);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN') // Chỉ role 'admin' được truy cập
+  @UseGuards(JwtAuthGuard)
+  @Post('create')
+  async create(@Body() createUserDto: CreateUserDto) {
+    try {
+      const user = await this.userService.create(createUserDto);
+      return new ResponseData(user, HttpStatus.OK, HttpMessage.SUCCESS);
+    } catch (error) {
+      return new ResponseData(null, HttpStatus.INTERNAL_SERVER_ERROR, HttpMessage.SERVER_ERROR);
+    }
+  }
+
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles('ADMIN') // Chỉ role 'admin' được truy cập
   @Get('all')
   async findAll(@Query() query: FindAllDto) {
     try {
