@@ -164,6 +164,39 @@ export class ExamService {
     return exam;
   }
 
+  async getExamQuestions(id: number) {
+    const exam = await this.prisma.exam.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+      },
+    });
+
+    if (!exam) {
+      throw new NotFoundException(`Exam with ID ${id} not found`);
+    }
+
+    const questions = await this.prisma.question.findMany({
+      where: { examId: id },
+      include: {
+        answerOptions: {
+          select: {
+            id: true,
+            content: true,
+            isCorrect: true,
+            optionLabel: true,
+          },
+        },
+      },
+      orderBy: {
+        orderIndex: 'asc',
+      },
+    });
+
+    return questions;
+  }
+
   async update(id: number, updateExamDto: UpdateExamDto) {
     const existingExam = await this.prisma.exam.findUnique({
       where: { id },

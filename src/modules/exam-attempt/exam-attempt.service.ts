@@ -296,7 +296,7 @@ export class ExamAttemptService {
     };
   }
 
-  async submitExam(id: number, answers: any[]) {
+  async submitExam(id: number, answers: any[], timeSpent?: number) {
     const attempt = await this.findOne(id);
     
     if (attempt.status !== 'InProgress') {
@@ -335,6 +335,7 @@ export class ExamAttemptService {
       status: 'Completed',
       score,
       correctAnswers,
+      timeSpent,
       detailedResult,
       completedAt: new Date(),
     });

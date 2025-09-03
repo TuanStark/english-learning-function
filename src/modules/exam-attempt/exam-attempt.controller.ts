@@ -153,10 +153,10 @@ export class ExamAttemptController {
   })
   async submitExam(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: { answers: any[] },
+    @Body() body: { answers: any[], timeSpent?: number },
   ) {
     try {
-      const result = await this.examAttemptService.submitExam(id, body.answers);
+      const result = await this.examAttemptService.submitExam(id, body.answers, body.timeSpent);
       return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
     } catch (error) {
       return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);

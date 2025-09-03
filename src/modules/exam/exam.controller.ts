@@ -76,6 +76,16 @@ export class ExamController {
     return this.examService.findOne(id);
   }
 
+  @Get(':id/questions')
+  @ApiOperation({ summary: 'Lấy tất cả câu hỏi của một bài kiểm tra' })
+  @ApiResponse({
+    status: 200,
+    description: 'Danh sách câu hỏi của bài kiểm tra',
+  })
+  getExamQuestions(@Param('id', ParseIntPipe) id: number) {
+    return this.examService.getExamQuestions(id);
+  }
+
   @Get(':id/stats')
   @ApiOperation({ summary: 'Lấy thống kê bài kiểm tra' })
   @ApiResponse({
