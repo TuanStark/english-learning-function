@@ -164,4 +164,55 @@ export class VocabularyTopicService {
       },
     };
   }
+
+  async addBulkVocabularies(topicId: number, vocabularies: any[]) {
+    // Verify topic exists
+    const topic = await this.prisma.vocabularyTopic.findUnique({
+      where: { id: topicId },
+    });
+
+    if (!topic) {
+      throw new NotFoundException(`Vocabulary topic with ID ${topicId} not found`);
+    }
+
+    // Prepare vocabulary data
+    const vocabularyData = vocabularies.map((vocab, index) => ({
+      topicId: topicId,
+      englishWord: vocab.englishWord,
+      pronunciation: vocab.pronunciation || null,
+      vietnameseMeaning: vocab.vietnameseMeaning,
+      wordType: vocab.wordType || null,
+      difficultyLevel: vocab.difficultyLevel || 'Easy',
+      image: vocab.image || null,
+      audioFile: vocab.audioFile || null,
+      isActive: true,
+    }));
+
+    // Create vocabularies in bulk
+    const result = await this.prisma.vocabulary.createMany({
+      data: vocabularyData,
+      skipDuplicates: true, // Skip if duplicate englishWord exists
+    });
+
+    // Return the created vocabularies
+    const createdVocabularies = await this.prisma.vocabulary.findMany({
+      where: {
+        topicId: topicId,
+        englishWord: {
+          in: vocabularies.map(v => v.englishWord)
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: result.count
+    });
+
+    return {
+      success: true,
+      created: result.count,
+      vocabularies: createdVocabularies,
+      skipped: vocabularies.length - result.count
+    };
+  }
 }

@@ -77,6 +77,24 @@ export class VocabularyTopicController {
     return this.vocabularyTopicService.getTopicStats(id);
   }
 
+  @Post(':id/vocabularies/bulk')
+  @ApiOperation({ summary: 'Thêm hàng loạt từ vựng vào chủ đề' })
+  @ApiResponse({
+    status: 201,
+    description: 'Từ vựng đã được thêm thành công',
+  })
+  async addBulkVocabularies(
+    @Param('id', ParseIntPipe) topicId: number,
+    @Body() bulkVocabulariesDto: { vocabularies: any[] }
+  ) {
+    try {
+      const result = await this.vocabularyTopicService.addBulkVocabularies(topicId, bulkVocabulariesDto.vocabularies);
+      return new ResponseData(result, HttpStatus.CREATED, HttpMessage.CREATED);
+    } catch (error) {
+      return new ResponseData(error, HttpStatus.BAD_REQUEST, HttpMessage.ACCESS_DENIED);
+    }
+  }
+
   @Patch(':id')
   @ApiOperation({ summary: 'Cập nhật chủ đề từ vựng' })
   @ApiResponse({
