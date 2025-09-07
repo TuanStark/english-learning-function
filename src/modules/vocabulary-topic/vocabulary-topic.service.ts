@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateVocabularyTopicDto } from './dto/create-vocabulary-topic.dto';
 import { UpdateVocabularyTopicDto } from './dto/update-vocabulary-topic.dto';
 import { FindAllDto } from 'src/common/global/find-all.dto';
+import { FindAllTopicsDto } from './dto/find-all-topics.dto';
 
 @Injectable()
 export class VocabularyTopicService {
@@ -30,13 +31,14 @@ export class VocabularyTopicService {
     }
   }
 
-  async findAll(query: FindAllDto) {
+  async findAll(query: FindAllTopicsDto) {
     const {
       page = 1,
       limit = 10,
       search = '',
       sortBy = 'createdAt',
-      sortOrder = 'desc'
+      sortOrder = 'desc',
+      topicName = null
     } = query;
 
     const pageNumber = Number(page);
@@ -57,6 +59,13 @@ export class VocabularyTopicService {
         ]
       }
       : {};
+
+    if (topicName) {
+      where.OR = [
+        { topicName: { contains: topicName } },
+      ];
+    }
+
     const orderBy = {
       [sortBy]: sortOrder
     };
@@ -77,7 +86,13 @@ export class VocabularyTopicService {
               difficultyLevel: true,
             },
           },
-        }
+          _count: {
+            select: {
+              vocabularies: true,
+            },
+          },
+        },
+        
       }),
       this.prisma.vocabularyTopic.count({
         where: where,

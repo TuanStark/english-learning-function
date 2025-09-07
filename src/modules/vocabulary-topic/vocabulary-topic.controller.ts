@@ -17,6 +17,7 @@ import { UpdateVocabularyTopicDto } from './dto/update-vocabulary-topic.dto';
 import { FindAllDto } from 'src/common/global/find-all.dto';
 import { HttpMessage } from 'src/common/global/globalEnum';
 import { ResponseData } from 'src/common/global/globalClass';
+import { FindAllTopicsDto } from './dto/find-all-topics.dto';
 
 @ApiTags('Vocabulary Topics')
 @Controller('vocabulary-topics')
@@ -44,7 +45,7 @@ export class VocabularyTopicController {
     status: 200,
     description: 'Danh sách chủ đề từ vựng',
   })
-  async findAll(@Query() query: FindAllDto) {
+  async findAll(@Query() query: FindAllTopicsDto) {
     try {
       const result = await this.vocabularyTopicService.findAll(query);
       return new ResponseData(result, HttpStatus.OK, HttpMessage.SUCCESS);
