@@ -43,4 +43,14 @@ export class CreateExamDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Loại bài kiểm tra',
+    example: 'TOEIC',
+    enum: ['TOEIC', 'IELTS', 'GRAMMAR', 'VOCABULARYQUIZ'],
+    default: 'TOEIC',
+  })
+  @IsOptional()
+  @IsIn(['TOEIC', 'IELTS', 'GRAMMAR', 'VOCABULARYQUIZ'])
+  type?: string;
 }

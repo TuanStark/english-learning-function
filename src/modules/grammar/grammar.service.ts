@@ -114,6 +114,17 @@ export class GrammarService {
       where: { id },
       include: {
         examples: true,
+        questions: {
+          include: {
+            answerOptions: true,
+            exam: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+          },
+        },
         userProgress: {
           include: {
             user: {

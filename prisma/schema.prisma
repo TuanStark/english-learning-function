@@ -62,7 +62,7 @@ model Exam {
   id          Int      @id @default(autoincrement())
   title       String   @db.VarChar(200)
   description String?  @db.Text
-  type        String?  @default("TOEIC")  
+  type        String?  @default("TOEIC")  // "TOEIC", "IELTS", "Grammar", "VocabularyQuiz"
   duration    Int // Duration in minutes
   difficulty  String   @db.VarChar(20) // "Easy", "Medium", "Hard"
   isActive    Boolean  @default(true)
@@ -78,6 +78,7 @@ model Exam {
 model Question {
   id           Int      @id @default(autoincrement())
   examId       Int
+  grammarId    Int?     // ⬅️ liên kết với Grammar
   content      String   @db.Text
   questionType String   @db.VarChar(50) // "MultipleChoice", "FillInBlank", etc.
   orderIndex   Int // Order of question in exam
@@ -86,6 +87,7 @@ model Question {
   updatedAt    DateTime @updatedAt
 
   exam           Exam            @relation(fields: [examId], references: [id], onDelete: Cascade)
+  grammar  Grammar? @relation(fields: [grammarId], references: [id], onDelete: Cascade)
   answerOptions  AnswerOption[]
   aiExplanations AIExplanation[]
 
@@ -193,6 +195,7 @@ model Grammar {
   updatedAt       DateTime @updatedAt
 
   examples     GrammarExample[]
+  questions    Question[]   // ⬅️ tất cả bài tập (questions) gắn với Grammar này
   userProgress UserGrammarProgress[]
 
   @@map("grammar")
