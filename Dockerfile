@@ -31,6 +31,9 @@
     # Copy schema Prisma (cần thiết cho prisma client)
     COPY --from=build /usr/src/app/prisma ./prisma
     
+    # Copy mail templates
+    COPY --from=build /usr/src/app/src/common/mail ./src/common/mail
+    
     # Generate prisma client trong production
     RUN npx prisma generate
     
