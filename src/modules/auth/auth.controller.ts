@@ -85,6 +85,34 @@ export class AuthController {
     }
   }
 
+  @Post('resend-code')
+  async resendCode(@Body() body: { id: string, email: string }) {
+    try {
+      const result = await this.authService.resendVerificationCode(+body.id, body.email);
+      return new ResponseData(result, HttpStatus.SUCCESS, HttpMessage.SUCCESS);
+    } catch (error) {
+      if (error.message.includes('User not found')) {
+        return new ResponseData(
+          null,
+          HttpStatus.NOT_FOUND,
+          'Người dùng không tồn tại',
+        );
+      }
+      if (error.message.includes('already verified')) {
+        return new ResponseData(
+          null,
+          HttpStatus.CONFLICT,
+          'Tài khoản đã được xác thực',
+        );
+      }
+      return new ResponseData(
+        null,
+        HttpStatus.SERVER_ERROR,
+        'Có lỗi xảy ra khi gửi lại mã xác thực',
+      );
+    }
+  }
+
     @UseGuards(LocalAuthGuard)
     @Post('login')
     async login(@Req() req: any) {

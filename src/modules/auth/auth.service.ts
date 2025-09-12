@@ -185,4 +185,49 @@ export class AuthService {
     });
     return user;
   }
+
+  async resendVerificationCode(userId: number, email: string) {
+    // Tìm user theo ID và email để đảm bảo an toàn
+    const user = await this.prisma.user.findFirst({
+      where: { 
+        id: userId,
+        email: email,
+        status: 'unactive' // Chỉ cho phép gửi lại mã nếu chưa active
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found or already verified');
+    }
+
+    // Tạo mã xác thực mới
+    const newCodeId = uuidv4();
+    const newCodeExpired = dayjs().add(1, 'minute').toDate();
+
+    // Cập nhật mã xác thực mới
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        codeId: newCodeId,
+        codeExpired: newCodeExpired,
+      },
+    });
+
+    // Gửi email với mã mới
+    await this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Activate your account at @EnglishMaster - New Code',
+      template: 'register',
+      context: {
+        name: user.fullName,
+        activationCode: newCodeId,
+      },
+    });
+
+    return {
+      message: 'Mã xác thực mới đã được gửi đến email của bạn',
+      codeId: newCodeId,
+      expiredAt: newCodeExpired,
+    };
+  }
 }
