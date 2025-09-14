@@ -37,8 +37,6 @@
     # Generate prisma client trong production
     RUN npx prisma generate
     
-    # Nếu bạn muốn migrate khi container khởi động:
-    # CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main.js"]
-    
-    CMD ["node", "dist/main.js"]
+    # Tự động migrate database khi container khởi động
+    CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main.js"]
     
