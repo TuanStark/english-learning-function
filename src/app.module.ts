@@ -27,6 +27,13 @@ import { LearningPathModule } from './modules/learning-path/learning-path.module
 import { PathStepModule } from './modules/path-step/path-step.module';
 import { UserLearningPathModule } from './modules/user-learning-path/user-learning-path.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { CourseModule } from './modules/course/course.module';
+import { CourseSectionModule } from './modules/course-section/course-section.module';
+import { CourseLessonModule } from './modules/course-lesson/course-lesson.module';
+import { CourseEnrollmentModule } from './modules/course-enrollment/course-enrollment.module';
+import { CourseProgressModule } from './modules/course-progress/course-progress.module';
+import { PaymentModule } from './modules/payment/payment.module';
+import { OrderModule } from './modules/order/order.module';
 @Module({
   imports: [
     MailerModule.forRootAsync({
@@ -82,6 +89,13 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     PathStepModule,
     UserLearningPathModule,
     DashboardModule,
+    CourseModule,
+    CourseSectionModule,
+    CourseLessonModule,
+    CourseEnrollmentModule,
+    CourseProgressModule,
+    PaymentModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [],

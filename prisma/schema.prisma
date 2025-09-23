@@ -53,6 +53,11 @@ model User {
   grammarProgress    UserGrammarProgress[]
   // favorites       UserFavorite[]
 
+    // New relations for Courses
+  enrollments        CourseEnrollment[]
+  payments           Payment[]
+  orders       Order[]
+
   @@map("users")
 }
 
@@ -382,3 +387,151 @@ model AIExplanation {
 
   @@map("ai_explanations")
 }
+
+// ================== COURSES ==================
+
+model Course {
+  id             Int       @id @default(autoincrement())
+  title          String    @db.VarChar(200)
+  slug           String    @unique @db.VarChar(250)
+  description    String?   @db.Text
+  coverImage     String?   @db.VarChar(500)
+  price          Float     @default(0) // giá bán
+  discountPrice  Float?    // giá giảm (nếu có)
+  level          String    @default("Beginner") @db.VarChar(50) // Beginner, Intermediate, Advanced
+  language       String    @default("English") @db.VarChar(50)
+  isPublished    Boolean   @default(false)
+  publishedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  sections     CourseSection[]
+  enrollments  CourseEnrollment[]
+  payments     Payment[]
+  orderItems   OrderItem[]
+
+  @@map("courses")
+}
+
+model CourseSection {
+  id        Int      @id @default(autoincrement())
+  courseId  Int
+  title     String   @db.VarChar(200)
+  orderIndex Int     @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  course   Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons  CourseLesson[]
+
+  @@map("course_sections")
+}
+
+model CourseLesson {
+  id           Int      @id @default(autoincrement())
+  sectionId    Int
+  title        String   @db.VarChar(200)
+  contentType  String   @db.VarChar(50) // Video, PDF, Quiz
+  contentUrl   String?  @db.VarChar(500) // link video/pdf
+  duration     Int? // thời lượng phút
+  orderIndex   Int     @default(0)
+  isPreview    Boolean @default(false) // free preview
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  section   CourseSection   @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  progresses CourseProgress[]
+
+  @@map("course_lessons")
+}
+
+model CourseEnrollment {
+  id         Int       @id @default(autoincrement())
+  userId     Int
+  courseId   Int
+  status     String    @default("InProgress") @db.VarChar(20) // InProgress, Completed
+  enrolledAt DateTime  @default(now())
+  completedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user    User   @relation(fields: [userId], references: [id])
+  course  Course @relation(fields: [courseId], references: [id])
+  progress CourseProgress[]
+
+  @@unique([userId, courseId])
+  @@map("course_enrollments")
+}
+
+model CourseProgress {
+  id        Int       @id @default(autoincrement())
+  enrollmentId Int
+  lessonId  Int
+  isCompleted Boolean @default(false)
+  completedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  enrollment CourseEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  lesson     CourseLesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([enrollmentId, lessonId])
+  @@map("course_progress")
+}
+
+model Order {
+  id            Int       @id @default(autoincrement())
+  userId        Int
+  status        String    @default("Pending") @db.VarChar(20) 
+  // "Pending", "Paid", "Cancelled", "Refunded"
+  totalAmount   Float
+  currency      String    @default("USD") @db.VarChar(10)
+  paymentMethod String?   @db.VarChar(50) // "CreditCard", "Paypal", "VNPay", "Momo"
+  paymentId     Int?      // link sang bảng Payment
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  user     User      @relation(fields: [userId], references: [id])
+  items    OrderItem[]
+  payment  Payment?
+
+  @@map("orders")
+}
+
+model Payment {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  courseId    Int
+  orderId     Int? @unique // 👈 Thêm orderId để link sang Order
+  amount      Float
+  status      String    @default("Pending") @db.VarChar(20) // Pending, Completed, Failed, Refunded
+  paymentMethod String? @db.VarChar(50) // CreditCard, PayPal, VNPay...
+  transactionId String? @db.VarChar(100)
+  paidAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+  order  Order?  @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
+}
+
+
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  courseId  Int
+  price     Float
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+
+  order  Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id])
+
+  @@map("order_items")
+}
+

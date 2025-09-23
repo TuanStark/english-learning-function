@@ -1,0 +1,2859 @@
+WARNING:  database "english_learning_app" has a collation version mismatch
+DETAIL:  The database was created using collation version 2.36, but the operating system provides version 2.41.
+HINT:  Rebuild all objects in this database that use the default collation and run ALTER DATABASE english_learning_app REFRESH COLLATION VERSION, or build PostgreSQL with the right library version.
+--
+-- PostgreSQL database dump
+--
+
+\restrict eJzxkDGLEN8cjnwybwQt2y53XGSxTfGAiY8DCiRbued1KllbUKuIdgxJtNXbBge
+
+-- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
+-- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: _prisma_migrations; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public._prisma_migrations (
+    id character varying(36) NOT NULL,
+    checksum character varying(64) NOT NULL,
+    finished_at timestamp with time zone,
+    migration_name character varying(255) NOT NULL,
+    logs text,
+    rolled_back_at timestamp with time zone,
+    started_at timestamp with time zone DEFAULT now() NOT NULL,
+    applied_steps_count integer DEFAULT 0 NOT NULL
+);
+
+
+ALTER TABLE public._prisma_migrations OWNER TO postgres;
+
+--
+-- Name: ai_explanations; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.ai_explanations (
+    id integer NOT NULL,
+    "examAttemptId" integer NOT NULL,
+    "questionId" integer NOT NULL,
+    explanation text NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.ai_explanations OWNER TO postgres;
+
+--
+-- Name: ai_explanations_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.ai_explanations_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.ai_explanations_id_seq OWNER TO postgres;
+
+--
+-- Name: ai_explanations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.ai_explanations_id_seq OWNED BY public.ai_explanations.id;
+
+
+--
+-- Name: answer_options; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.answer_options (
+    id integer NOT NULL,
+    "questionId" integer NOT NULL,
+    content text NOT NULL,
+    "isCorrect" boolean DEFAULT false NOT NULL,
+    "optionLabel" character varying(1) NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.answer_options OWNER TO postgres;
+
+--
+-- Name: answer_options_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.answer_options_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.answer_options_id_seq OWNER TO postgres;
+
+--
+-- Name: answer_options_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.answer_options_id_seq OWNED BY public.answer_options.id;
+
+
+--
+-- Name: blog_categories; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.blog_categories (
+    id integer NOT NULL,
+    "categoryName" character varying(100) NOT NULL,
+    description text,
+    slug character varying(150) NOT NULL,
+    "orderIndex" integer DEFAULT 0 NOT NULL,
+    "isActive" boolean DEFAULT true NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.blog_categories OWNER TO postgres;
+
+--
+-- Name: blog_categories_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.blog_categories_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.blog_categories_id_seq OWNER TO postgres;
+
+--
+-- Name: blog_categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.blog_categories_id_seq OWNED BY public.blog_categories.id;
+
+
+--
+-- Name: blog_comments; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.blog_comments (
+    id integer NOT NULL,
+    "blogPostId" integer NOT NULL,
+    "userId" integer NOT NULL,
+    content text NOT NULL,
+    "parentCommentId" integer,
+    "isActive" boolean DEFAULT true NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.blog_comments OWNER TO postgres;
+
+--
+-- Name: blog_comments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.blog_comments_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.blog_comments_id_seq OWNER TO postgres;
+
+--
+-- Name: blog_comments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.blog_comments_id_seq OWNED BY public.blog_comments.id;
+
+
+--
+-- Name: blog_posts; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.blog_posts (
+    id integer NOT NULL,
+    title character varying(300) NOT NULL,
+    slug character varying(350) NOT NULL,
+    excerpt text,
+    content text NOT NULL,
+    "featuredImage" character varying(500),
+    "authorId" integer NOT NULL,
+    "categoryId" integer NOT NULL,
+    status character varying(20) DEFAULT 'Draft'::character varying NOT NULL,
+    "viewCount" integer DEFAULT 0 NOT NULL,
+    "seoKeywords" character varying(300),
+    "seoDescription" character varying(500),
+    "publishedAt" timestamp(3) without time zone,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.blog_posts OWNER TO postgres;
+
+--
+-- Name: blog_posts_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.blog_posts_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.blog_posts_id_seq OWNER TO postgres;
+
+--
+-- Name: blog_posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.blog_posts_id_seq OWNED BY public.blog_posts.id;
+
+
+--
+-- Name: course_enrollments; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.course_enrollments (
+    id integer NOT NULL,
+    "userId" integer NOT NULL,
+    "courseId" integer NOT NULL,
+    status character varying(20) DEFAULT 'InProgress'::character varying NOT NULL,
+    "enrolledAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "completedAt" timestamp(3) without time zone,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.course_enrollments OWNER TO postgres;
+
+--
+-- Name: course_enrollments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.course_enrollments_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.course_enrollments_id_seq OWNER TO postgres;
+
+--
+-- Name: course_enrollments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.course_enrollments_id_seq OWNED BY public.course_enrollments.id;
+
+
+--
+-- Name: course_lessons; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.course_lessons (
+    id integer NOT NULL,
+    "sectionId" integer NOT NULL,
+    title character varying(200) NOT NULL,
+    "contentType" character varying(50) NOT NULL,
+    "contentUrl" character varying(500),
+    duration integer,
+    "orderIndex" integer DEFAULT 0 NOT NULL,
+    "isPreview" boolean DEFAULT false NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.course_lessons OWNER TO postgres;
+
+--
+-- Name: course_lessons_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.course_lessons_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.course_lessons_id_seq OWNER TO postgres;
+
+--
+-- Name: course_lessons_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.course_lessons_id_seq OWNED BY public.course_lessons.id;
+
+
+--
+-- Name: course_progress; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.course_progress (
+    id integer NOT NULL,
+    "enrollmentId" integer NOT NULL,
+    "lessonId" integer NOT NULL,
+    "isCompleted" boolean DEFAULT false NOT NULL,
+    "completedAt" timestamp(3) without time zone,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.course_progress OWNER TO postgres;
+
+--
+-- Name: course_progress_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.course_progress_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.course_progress_id_seq OWNER TO postgres;
+
+--
+-- Name: course_progress_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.course_progress_id_seq OWNED BY public.course_progress.id;
+
+
+--
+-- Name: course_sections; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.course_sections (
+    id integer NOT NULL,
+    "courseId" integer NOT NULL,
+    title character varying(200) NOT NULL,
+    "orderIndex" integer DEFAULT 0 NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.course_sections OWNER TO postgres;
+
+--
+-- Name: course_sections_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.course_sections_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.course_sections_id_seq OWNER TO postgres;
+
+--
+-- Name: course_sections_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.course_sections_id_seq OWNED BY public.course_sections.id;
+
+
+--
+-- Name: courses; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.courses (
+    id integer NOT NULL,
+    title character varying(200) NOT NULL,
+    slug character varying(250) NOT NULL,
+    description text,
+    "coverImage" character varying(500),
+    price double precision DEFAULT 0 NOT NULL,
+    "discountPrice" double precision,
+    level character varying(50) DEFAULT 'Beginner'::character varying NOT NULL,
+    language character varying(50) DEFAULT 'English'::character varying NOT NULL,
+    "isPublished" boolean DEFAULT false NOT NULL,
+    "publishedAt" timestamp(3) without time zone,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.courses OWNER TO postgres;
+
+--
+-- Name: courses_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.courses_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.courses_id_seq OWNER TO postgres;
+
+--
+-- Name: courses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.courses_id_seq OWNED BY public.courses.id;
+
+
+--
+-- Name: exam_attempts; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.exam_attempts (
+    id integer NOT NULL,
+    "userId" integer NOT NULL,
+    "examId" integer NOT NULL,
+    score double precision,
+    "totalQuestions" integer NOT NULL,
+    "correctAnswers" integer DEFAULT 0 NOT NULL,
+    "timeSpent" integer,
+    status character varying(20) DEFAULT 'InProgress'::character varying NOT NULL,
+    "detailedResult" jsonb,
+    "startedAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "completedAt" timestamp(3) without time zone,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.exam_attempts OWNER TO postgres;
+
+--
+-- Name: exam_attempts_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.exam_attempts_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.exam_attempts_id_seq OWNER TO postgres;
+
+--
+-- Name: exam_attempts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.exam_attempts_id_seq OWNED BY public.exam_attempts.id;
+
+
+--
+-- Name: exams; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.exams (
+    id integer NOT NULL,
+    title character varying(200) NOT NULL,
+    description text,
+    duration integer NOT NULL,
+    difficulty character varying(20) NOT NULL,
+    "isActive" boolean DEFAULT true NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL,
+    type text DEFAULT 'TOEIC'::text
+);
+
+
+ALTER TABLE public.exams OWNER TO postgres;
+
+--
+-- Name: exams_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.exams_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.exams_id_seq OWNER TO postgres;
+
+--
+-- Name: exams_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.exams_id_seq OWNED BY public.exams.id;
+
+
+--
+-- Name: grammar; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.grammar (
+    id integer NOT NULL,
+    title character varying(200) NOT NULL,
+    content text NOT NULL,
+    "difficultyLevel" character varying(20) DEFAULT 'Easy'::character varying NOT NULL,
+    "orderIndex" integer DEFAULT 0 NOT NULL,
+    "isActive" boolean DEFAULT true NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.grammar OWNER TO postgres;
+
+--
+-- Name: grammar_examples; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.grammar_examples (
+    id integer NOT NULL,
+    "grammarId" integer NOT NULL,
+    "englishSentence" text NOT NULL,
+    "vietnameseSentence" text NOT NULL,
+    explanation text,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.grammar_examples OWNER TO postgres;
+
+--
+-- Name: grammar_examples_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.grammar_examples_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.grammar_examples_id_seq OWNER TO postgres;
+
+--
+-- Name: grammar_examples_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.grammar_examples_id_seq OWNED BY public.grammar_examples.id;
+
+
+--
+-- Name: grammar_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.grammar_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.grammar_id_seq OWNER TO postgres;
+
+--
+-- Name: grammar_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.grammar_id_seq OWNED BY public.grammar.id;
+
+
+--
+-- Name: learning_paths; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.learning_paths (
+    id integer NOT NULL,
+    "pathName" character varying(200) NOT NULL,
+    description text,
+    "coverImage" character varying(500),
+    "targetLevel" character varying(50) NOT NULL,
+    "estimatedWeeks" integer,
+    "orderIndex" integer DEFAULT 0 NOT NULL,
+    "isActive" boolean DEFAULT true NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.learning_paths OWNER TO postgres;
+
+--
+-- Name: learning_paths_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.learning_paths_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.learning_paths_id_seq OWNER TO postgres;
+
+--
+-- Name: learning_paths_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.learning_paths_id_seq OWNED BY public.learning_paths.id;
+
+
+--
+-- Name: order_items; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.order_items (
+    id integer NOT NULL,
+    "orderId" integer NOT NULL,
+    "courseId" integer NOT NULL,
+    price double precision NOT NULL,
+    quantity integer DEFAULT 1 NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.order_items OWNER TO postgres;
+
+--
+-- Name: order_items_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.order_items_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.order_items_id_seq OWNER TO postgres;
+
+--
+-- Name: order_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.order_items_id_seq OWNED BY public.order_items.id;
+
+
+--
+-- Name: orders; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.orders (
+    id integer NOT NULL,
+    "userId" integer NOT NULL,
+    status character varying(20) DEFAULT 'Pending'::character varying NOT NULL,
+    "totalAmount" double precision NOT NULL,
+    currency character varying(10) DEFAULT 'USD'::character varying NOT NULL,
+    "paymentMethod" character varying(50),
+    "paymentId" integer,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.orders OWNER TO postgres;
+
+--
+-- Name: orders_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.orders_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.orders_id_seq OWNER TO postgres;
+
+--
+-- Name: orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.orders_id_seq OWNED BY public.orders.id;
+
+
+--
+-- Name: path_steps; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.path_steps (
+    id integer NOT NULL,
+    "learningPathId" integer NOT NULL,
+    "stepName" character varying(200) NOT NULL,
+    description text,
+    "contentType" character varying(50) NOT NULL,
+    "contentId" integer,
+    "orderIndex" integer NOT NULL,
+    "isRequired" boolean DEFAULT true NOT NULL,
+    "estimatedMinutes" integer,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.path_steps OWNER TO postgres;
+
+--
+-- Name: path_steps_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.path_steps_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.path_steps_id_seq OWNER TO postgres;
+
+--
+-- Name: path_steps_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.path_steps_id_seq OWNED BY public.path_steps.id;
+
+
+--
+-- Name: payments; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.payments (
+    id integer NOT NULL,
+    "userId" integer NOT NULL,
+    "courseId" integer NOT NULL,
+    amount double precision NOT NULL,
+    status character varying(20) DEFAULT 'Pending'::character varying NOT NULL,
+    "paymentMethod" character varying(50),
+    "transactionId" character varying(100),
+    "paidAt" timestamp(3) without time zone,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL,
+    "orderId" integer
+);
+
+
+ALTER TABLE public.payments OWNER TO postgres;
+
+--
+-- Name: payments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.payments_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.payments_id_seq OWNER TO postgres;
+
+--
+-- Name: payments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.payments_id_seq OWNED BY public.payments.id;
+
+
+--
+-- Name: questions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.questions (
+    id integer NOT NULL,
+    "examId" integer NOT NULL,
+    content text NOT NULL,
+    "questionType" character varying(50) NOT NULL,
+    "orderIndex" integer NOT NULL,
+    points double precision DEFAULT 1 NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL,
+    "grammarId" integer
+);
+
+
+ALTER TABLE public.questions OWNER TO postgres;
+
+--
+-- Name: questions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.questions_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.questions_id_seq OWNER TO postgres;
+
+--
+-- Name: questions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.questions_id_seq OWNED BY public.questions.id;
+
+
+--
+-- Name: roles; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.roles (
+    id integer NOT NULL,
+    "roleName" character varying(50) NOT NULL,
+    description text,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.roles OWNER TO postgres;
+
+--
+-- Name: roles_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.roles_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.roles_id_seq OWNER TO postgres;
+
+--
+-- Name: roles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.roles_id_seq OWNED BY public.roles.id;
+
+
+--
+-- Name: user_grammar_progress; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.user_grammar_progress (
+    id integer NOT NULL,
+    "userId" integer NOT NULL,
+    "grammarId" integer NOT NULL,
+    status character varying(20) DEFAULT 'Learning'::character varying NOT NULL,
+    "masteryLevel" integer DEFAULT 0 NOT NULL,
+    "timesPracticed" integer DEFAULT 0 NOT NULL,
+    "lastPracticedAt" timestamp(3) without time zone,
+    "firstLearnedAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.user_grammar_progress OWNER TO postgres;
+
+--
+-- Name: user_grammar_progress_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.user_grammar_progress_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.user_grammar_progress_id_seq OWNER TO postgres;
+
+--
+-- Name: user_grammar_progress_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.user_grammar_progress_id_seq OWNED BY public.user_grammar_progress.id;
+
+
+--
+-- Name: user_learning_paths; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.user_learning_paths (
+    id integer NOT NULL,
+    "userId" integer NOT NULL,
+    "learningPathId" integer NOT NULL,
+    status character varying(20) DEFAULT 'InProgress'::character varying NOT NULL,
+    progress jsonb,
+    "startedAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "completedAt" timestamp(3) without time zone,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.user_learning_paths OWNER TO postgres;
+
+--
+-- Name: user_learning_paths_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.user_learning_paths_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.user_learning_paths_id_seq OWNER TO postgres;
+
+--
+-- Name: user_learning_paths_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.user_learning_paths_id_seq OWNED BY public.user_learning_paths.id;
+
+
+--
+-- Name: user_vocabulary_progress; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.user_vocabulary_progress (
+    id integer NOT NULL,
+    "userId" integer NOT NULL,
+    "vocabularyId" integer NOT NULL,
+    status character varying(20) DEFAULT 'Learning'::character varying NOT NULL,
+    "masteryLevel" integer DEFAULT 0 NOT NULL,
+    "timesPracticed" integer DEFAULT 0 NOT NULL,
+    "lastPracticedAt" timestamp(3) without time zone,
+    "firstLearnedAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.user_vocabulary_progress OWNER TO postgres;
+
+--
+-- Name: user_vocabulary_progress_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.user_vocabulary_progress_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.user_vocabulary_progress_id_seq OWNER TO postgres;
+
+--
+-- Name: user_vocabulary_progress_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.user_vocabulary_progress_id_seq OWNED BY public.user_vocabulary_progress.id;
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users (
+    id integer NOT NULL,
+    email character varying(255) NOT NULL,
+    password character varying(255) NOT NULL,
+    "fullName" character varying(100) NOT NULL,
+    avatar character varying(500),
+    "dateOfBirth" timestamp(3) without time zone,
+    gender character varying(10),
+    "phoneNumber" character varying(20),
+    address text,
+    "isActive" boolean DEFAULT true NOT NULL,
+    "emailVerified" boolean DEFAULT false NOT NULL,
+    "roleId" integer NOT NULL,
+    status text DEFAULT 'active'::text NOT NULL,
+    "codeId" text,
+    "codeExpired" timestamp(3) without time zone,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.users_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.users_id_seq OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
+
+
+--
+-- Name: vocabularies; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.vocabularies (
+    id integer NOT NULL,
+    "topicId" integer NOT NULL,
+    "englishWord" character varying(100) NOT NULL,
+    pronunciation character varying(100),
+    "vietnameseMeaning" text NOT NULL,
+    "wordType" character varying(50),
+    "difficultyLevel" character varying(20) DEFAULT 'Easy'::character varying NOT NULL,
+    image character varying(500),
+    "audioFile" character varying(500),
+    "isActive" boolean DEFAULT true NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.vocabularies OWNER TO postgres;
+
+--
+-- Name: vocabularies_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.vocabularies_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.vocabularies_id_seq OWNER TO postgres;
+
+--
+-- Name: vocabularies_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.vocabularies_id_seq OWNED BY public.vocabularies.id;
+
+
+--
+-- Name: vocabulary_examples; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.vocabulary_examples (
+    id integer NOT NULL,
+    "vocabularyId" integer NOT NULL,
+    "englishSentence" text NOT NULL,
+    "vietnameseSentence" text NOT NULL,
+    "audioFile" character varying(500),
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.vocabulary_examples OWNER TO postgres;
+
+--
+-- Name: vocabulary_examples_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.vocabulary_examples_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.vocabulary_examples_id_seq OWNER TO postgres;
+
+--
+-- Name: vocabulary_examples_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.vocabulary_examples_id_seq OWNED BY public.vocabulary_examples.id;
+
+
+--
+-- Name: vocabulary_topics; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.vocabulary_topics (
+    id integer NOT NULL,
+    "topicName" character varying(100) NOT NULL,
+    description text,
+    image character varying(500),
+    "orderIndex" integer DEFAULT 0 NOT NULL,
+    "isActive" boolean DEFAULT true NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.vocabulary_topics OWNER TO postgres;
+
+--
+-- Name: vocabulary_topics_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.vocabulary_topics_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.vocabulary_topics_id_seq OWNER TO postgres;
+
+--
+-- Name: vocabulary_topics_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.vocabulary_topics_id_seq OWNED BY public.vocabulary_topics.id;
+
+
+--
+-- Name: ai_explanations id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ai_explanations ALTER COLUMN id SET DEFAULT nextval('public.ai_explanations_id_seq'::regclass);
+
+
+--
+-- Name: answer_options id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.answer_options ALTER COLUMN id SET DEFAULT nextval('public.answer_options_id_seq'::regclass);
+
+
+--
+-- Name: blog_categories id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.blog_categories ALTER COLUMN id SET DEFAULT nextval('public.blog_categories_id_seq'::regclass);
+
+
+--
+-- Name: blog_comments id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.blog_comments ALTER COLUMN id SET DEFAULT nextval('public.blog_comments_id_seq'::regclass);
+
+
+--
+-- Name: blog_posts id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.blog_posts ALTER COLUMN id SET DEFAULT nextval('public.blog_posts_id_seq'::regclass);
+
+
+--
+-- Name: course_enrollments id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.course_enrollments ALTER COLUMN id SET DEFAULT nextval('public.course_enrollments_id_seq'::regclass);
+
+
+--
+-- Name: course_lessons id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.course_lessons ALTER COLUMN id SET DEFAULT nextval('public.course_lessons_id_seq'::regclass);
+
+
+--
+-- Name: course_progress id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.course_progress ALTER COLUMN id SET DEFAULT nextval('public.course_progress_id_seq'::regclass);
+
+
+--
+-- Name: course_sections id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.course_sections ALTER COLUMN id SET DEFAULT nextval('public.course_sections_id_seq'::regclass);
+
+
+--
+-- Name: courses id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.courses ALTER COLUMN id SET DEFAULT nextval('public.courses_id_seq'::regclass);
+
+
+--
+-- Name: exam_attempts id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.exam_attempts ALTER COLUMN id SET DEFAULT nextval('public.exam_attempts_id_seq'::regclass);
+
+
+--
+-- Name: exams id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.exams ALTER COLUMN id SET DEFAULT nextval('public.exams_id_seq'::regclass);
+
+
+--
+-- Name: grammar id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.grammar ALTER COLUMN id SET DEFAULT nextval('public.grammar_id_seq'::regclass);
+
+
+--
+-- Name: grammar_examples id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.grammar_examples ALTER COLUMN id SET DEFAULT nextval('public.grammar_examples_id_seq'::regclass);
+
+
+--
+-- Name: learning_paths id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.learning_paths ALTER COLUMN id SET DEFAULT nextval('public.learning_paths_id_seq'::regclass);
+
+
+--
+-- Name: order_items id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_items ALTER COLUMN id SET DEFAULT nextval('public.order_items_id_seq'::regclass);
+
+
+--
+-- Name: orders id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.orders ALTER COLUMN id SET DEFAULT nextval('public.orders_id_seq'::regclass);
+
+
+--
+-- Name: path_steps id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.path_steps ALTER COLUMN id SET DEFAULT nextval('public.path_steps_id_seq'::regclass);
+
+
+--
+-- Name: payments id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.payments ALTER COLUMN id SET DEFAULT nextval('public.payments_id_seq'::regclass);
+
+
+--
+-- Name: questions id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.questions ALTER COLUMN id SET DEFAULT nextval('public.questions_id_seq'::regclass);
+
+
+--
+-- Name: roles id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.roles ALTER COLUMN id SET DEFAULT nextval('public.roles_id_seq'::regclass);
+
+
+--
+-- Name: user_grammar_progress id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.user_grammar_progress ALTER COLUMN id SET DEFAULT nextval('public.user_grammar_progress_id_seq'::regclass);
+
+
+--
+-- Name: user_learning_paths id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.user_learning_paths ALTER COLUMN id SET DEFAULT nextval('public.user_learning_paths_id_seq'::regclass);
+
+
+--
+-- Name: user_vocabulary_progress id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.user_vocabulary_progress ALTER COLUMN id SET DEFAULT nextval('public.user_vocabulary_progress_id_seq'::regclass);
+
+
+--
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+
+
+--
+-- Name: vocabularies id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.vocabularies ALTER COLUMN id SET DEFAULT nextval('public.vocabularies_id_seq'::regclass);
+
+
+--
+-- Name: vocabulary_examples id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.vocabulary_examples ALTER COLUMN id SET DEFAULT nextval('public.vocabulary_examples_id_seq'::regclass);
+
+
+--
+-- Name: vocabulary_topics id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.vocabulary_topics ALTER COLUMN id SET DEFAULT nextval('public.vocabulary_topics_id_seq'::regclass);
+
+
+--
+-- Data for Name: _prisma_migrations; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public._prisma_migrations (id, checksum, finished_at, migration_name, logs, rolled_back_at, started_at, applied_steps_count) FROM stdin;
+5828fa82-3908-46d7-8d66-e5619b86a74c	3f0b0904a7d4a1f6ff404dbef550fa47db30723206c0c08ec0642c246682419f	2025-08-16 08:00:45.805539+00	20250816080045_init	\N	\N	2025-08-16 08:00:45.746613+00	1
+\.
+
+
+--
+-- Data for Name: ai_explanations; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.ai_explanations (id, "examAttemptId", "questionId", explanation, "createdAt") FROM stdin;
+\.
+
+
+--
+-- Data for Name: answer_options; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.answer_options (id, "questionId", content, "isCorrect", "optionLabel", "createdAt", "updatedAt") FROM stdin;
+1	1	am	t	A	2025-08-20 11:37:00.543	2025-08-20 11:37:00.543
+2	1	is	f	B	2025-08-20 11:37:53.253	2025-08-20 11:37:53.253
+3	2	vacation	f	A	2025-08-25 15:28:46.814	2025-08-25 15:28:46.814
+4	2	work	t	B	2025-08-25 15:29:09.544	2025-08-25 15:29:09.544
+5	2	friends	f	C	2025-08-25 15:29:59.887	2025-08-25 15:29:59.887
+6	2	salary	f	D	2025-08-25 15:30:18.125	2025-08-25 15:30:18.125
+7	3	are	f	A	2025-08-30 13:31:38.568	2025-08-30 13:31:38.568
+8	3	is	t	B	2025-08-30 13:32:16.265	2025-08-30 13:32:16.265
+9	3	am	f	C	2025-08-30 13:34:32.163	2025-08-30 13:34:32.163
+10	3	be	f	D	2025-08-30 13:34:41.334	2025-08-30 13:34:41.334
+11	4	He go to school every day.	f	A	2025-08-30 13:36:06.225	2025-08-30 13:36:06.225
+12	4	He goes to school every day.	t	B	2025-08-30 13:36:46.617	2025-08-30 13:36:46.617
+13	5	am	t	A	2025-08-30 13:38:43.515	2025-08-30 13:38:43.515
+14	5	is	f	B	2025-08-30 13:38:53.112	2025-08-30 13:38:53.112
+15	5	are	f	C	2025-08-30 13:39:18.526	2025-08-30 13:39:18.526
+16	5	be	f	D	2025-08-30 13:39:42.467	2025-08-30 13:39:42.467
+17	6	a	f	A	2025-08-30 13:47:24.366	2025-08-30 13:47:24.366
+18	6	an	t	B	2025-08-30 13:49:42.581	2025-08-30 13:49:42.581
+19	6	the	f	C	2025-08-30 13:49:52.37	2025-08-30 13:49:52.37
+20	6	is	f	D	2025-08-30 13:50:04.832	2025-08-30 13:50:04.832
+21	7	She not like pizza.	f	A	2025-08-30 13:51:52.401	2025-08-30 13:51:52.401
+22	7	She don’t like pizza.	f	B	2025-08-30 13:52:21.805	2025-08-30 13:52:21.805
+23	7	She doesn’t like pizza.	t	C	2025-08-30 13:52:56.266	2025-08-30 13:52:56.266
+24	7	She no like pizza.	f	D	2025-08-30 13:54:04.675	2025-08-30 13:54:04.675
+25	8	in	f	A	2025-08-30 13:58:34.97	2025-08-30 13:58:34.97
+26	8	on	t	B	2025-08-30 13:58:47.761	2025-08-30 13:58:47.761
+27	8	under	f	C	2025-08-30 13:58:59.121	2025-08-30 13:58:59.121
+28	8	between	f	D	2025-08-30 13:59:27.705	2025-08-30 13:59:27.705
+29	9	Dog	f	A	2025-08-30 14:03:51.086	2025-08-30 14:03:51.086
+30	9	She	t	B	2025-08-30 14:04:00.88	2025-08-30 14:04:00.88
+31	9	Table	f	C	2025-08-30 14:04:10.691	2025-08-30 14:04:10.691
+32	9	Book	f	D	2025-08-30 14:04:28.953	2025-08-30 14:04:28.953
+33	10	childs	f	A	2025-08-30 14:07:53.978	2025-08-30 14:07:53.978
+34	10	childrens	f	B	2025-08-30 14:08:11.585	2025-08-30 14:08:11.585
+35	10	children	t	C	2025-08-30 14:08:39.487	2025-08-30 14:08:39.487
+36	10	childes	f	D	2025-08-30 14:08:58.254	2025-08-30 14:08:58.254
+45	13	A. is	f	A	2025-08-31 01:06:28.088	2025-08-31 01:06:28.088
+47	13	C. was	f	C	2025-08-31 01:06:28.104	2025-08-31 01:06:28.104
+61	17	A. a	f	A	2025-08-31 01:06:28.261	2025-08-31 01:06:28.261
+62	17	B. an	t	B	2025-08-31 01:06:28.275	2025-08-31 01:06:28.275
+75	1	This is a test answer option with long content to check if it gets truncated when saved to database. Let me add more text to make it really long and see what happens.	f	T	2025-08-31 01:16:15.814	2025-08-31 01:16:15.814
+76	1	This is a test answer option with long content to check if it gets truncated when saved to database. Let me add more text to make it really long and see what happens.	f	T	2025-08-31 01:19:32.011	2025-08-31 01:19:32.011
+77	1	This is a test answer option with long content to check if it gets truncated when saved to database. Let me add more text to make it really long and see what happens.	f	T	2025-08-31 01:22:19.353	2025-08-31 01:22:19.353
+78	21	are	f	A	2025-08-31 01:50:42.237	2025-08-31 01:50:42.237
+79	21	is	t	B	2025-08-31 01:50:42.252	2025-08-31 01:50:42.252
+80	21	am	f	C	2025-08-31 01:50:42.26	2025-08-31 01:50:42.26
+81	21	be	f	D	2025-08-31 01:50:42.27	2025-08-31 01:50:42.27
+82	22	go	f	A	2025-08-31 01:50:42.284	2025-08-31 01:50:42.284
+83	22	goes	t	B	2025-08-31 01:50:42.292	2025-08-31 01:50:42.292
+84	22	going	f	C	2025-08-31 01:50:42.3	2025-08-31 01:50:42.3
+85	22	gone	f	D	2025-08-31 01:50:42.307	2025-08-31 01:50:42.307
+86	23	is	f	A	2025-08-31 01:50:42.321	2025-08-31 01:50:42.321
+87	23	are	f	B	2025-08-31 01:50:42.327	2025-08-31 01:50:42.327
+88	23	am	t	C	2025-08-31 01:50:42.333	2025-08-31 01:50:42.333
+89	23	be	f	D	2025-08-31 01:50:42.339	2025-08-31 01:50:42.339
+90	24	a	f	A	2025-08-31 01:50:42.351	2025-08-31 01:50:42.351
+91	24	an	t	B	2025-08-31 01:50:42.357	2025-08-31 01:50:42.357
+92	24	the	f	C	2025-08-31 01:50:42.364	2025-08-31 01:50:42.364
+93	24	some	f	D	2025-08-31 01:50:42.372	2025-08-31 01:50:42.372
+51	14	most expensive	f	C	2025-08-31 01:06:28.138	2025-08-31 06:36:21.766
+40	11	gone	f	D	2025-08-31 01:06:28.038	2025-08-31 06:28:28.592
+39	11	goes	f	C	2025-08-31 01:06:28.031	2025-08-31 06:28:46.971
+38	11	B. went	t	B	2025-08-31 01:06:28.018	2025-08-31 06:33:25.473
+37	11	A. go	f	A	2025-08-31 01:06:28.003	2025-08-31 06:33:35.075
+44	12	D. will can	f	D	2025-08-31 01:06:28.074	2025-08-31 06:34:45.792
+43	12	coulds	f	C	2025-08-31 01:06:28.067	2025-08-31 06:34:57.175
+42	12	can to	f	B	2025-08-31 01:06:28.059	2025-08-31 06:35:08.984
+41	12	can	t	A	2025-08-31 01:06:28.053	2025-08-31 06:35:14.404
+48	13	were	f	D	2025-08-31 01:06:28.11	2025-08-31 06:35:37.874
+46	13	are	t	B	2025-08-31 01:06:28.096	2025-08-31 06:35:46.733
+52	14	expensive	f	D	2025-08-31 01:06:28.146	2025-08-31 06:36:05.927
+50	14	more expensive	t	B	2025-08-31 01:06:28.131	2025-08-31 06:36:36.143
+49	14	expensiver	f	A	2025-08-31 01:06:28.124	2025-08-31 06:36:48.988
+56	15	went	f	D	2025-08-31 01:06:28.184	2025-08-31 06:37:05.393
+55	15	going	f	C	2025-08-31 01:06:28.176	2025-08-31 06:37:17.105
+54	15	go	t	B	2025-08-31 01:06:28.169	2025-08-31 06:37:25.624
+53	15	goes	f	A	2025-08-31 01:06:28.16	2025-08-31 06:37:34.897
+60	16	watching	f	D	2025-08-31 01:06:28.235	2025-08-31 06:38:02.804
+59	16	watches	f	C	2025-08-31 01:06:28.225	2025-08-31 06:38:19.854
+58	16	watch	f	B	2025-08-31 01:06:28.213	2025-08-31 06:38:33.405
+57	16	watched	t	A	2025-08-31 01:06:28.203	2025-08-31 06:38:46.801
+64	17	one	f	D	2025-08-31 01:06:28.296	2025-08-31 06:39:08.655
+63	17	the	f	C	2025-08-31 01:06:28.287	2025-08-31 06:39:15.262
+103	26	has	f	B	2025-08-31 06:48:05.443	2025-08-31 06:48:05.443
+65	18	They doesn’t like tea	f	A	2025-08-31 01:06:28.313	2025-08-31 06:40:03.546
+66	18	They don’t like tea	t	B	2025-08-31 01:06:28.319	2025-08-31 06:40:21.191
+69	19	does	f	C	2025-08-31 01:06:28.346	2025-08-31 06:40:40.531
+68	19	did	t	B	2025-08-31 01:06:28.338	2025-08-31 06:40:46.47
+67	19	do	f	A	2025-08-31 01:06:28.331	2025-08-31 06:40:52.787
+94	19	done	f	D	2025-08-31 06:41:03.726	2025-08-31 06:41:03.726
+71	20	Where you go?	f	A	2025-08-31 01:06:28.379	2025-08-31 06:41:26.597
+95	20	Where do you go?	t	B	2025-08-31 06:41:44.757	2025-08-31 06:41:44.757
+96	20	Where goes you?	f	C	2025-08-31 06:41:59.733	2025-08-31 06:41:59.733
+97	20	Where you does go?	f	D	2025-08-31 06:42:15.924	2025-08-31 06:42:15.924
+98	25	is	f	A	2025-08-31 06:48:05.396	2025-08-31 06:48:05.396
+99	25	are	t	B	2025-08-31 06:48:05.411	2025-08-31 06:48:05.411
+100	25	am	f	C	2025-08-31 06:48:05.418	2025-08-31 06:48:05.418
+101	25	be	f	D	2025-08-31 06:48:05.424	2025-08-31 06:48:05.424
+102	26	have	t	A	2025-08-31 06:48:05.437	2025-08-31 06:48:05.437
+104	26	having	f	C	2025-08-31 06:48:05.449	2025-08-31 06:48:05.449
+105	26	had	f	D	2025-08-31 06:48:05.455	2025-08-31 06:48:05.455
+106	27	play	t	A	2025-08-31 06:48:05.468	2025-08-31 06:48:05.468
+107	27	plays	f	B	2025-08-31 06:48:05.474	2025-08-31 06:48:05.474
+108	27	played	f	C	2025-08-31 06:48:05.48	2025-08-31 06:48:05.48
+109	27	playing	f	D	2025-08-31 06:48:05.487	2025-08-31 06:48:05.487
+110	28	some	t	A	2025-08-31 06:48:05.5	2025-08-31 06:48:05.5
+111	28	a	f	B	2025-08-31 06:48:05.509	2025-08-31 06:48:05.509
+112	28	an	f	C	2025-08-31 06:48:05.515	2025-08-31 06:48:05.515
+113	28	one	f	D	2025-08-31 06:48:05.522	2025-08-31 06:48:05.522
+114	29	go	f	A	2025-08-31 06:48:05.54	2025-08-31 06:48:05.54
+115	29	goes	f	B	2025-08-31 06:48:05.55	2025-08-31 06:48:05.55
+116	29	went	t	C	2025-08-31 06:48:05.56	2025-08-31 06:48:05.56
+117	29	going	f	D	2025-08-31 06:48:05.572	2025-08-31 06:48:05.572
+118	30	beautiful	f	A	2025-08-31 06:48:05.596	2025-08-31 06:48:05.596
+119	30	more beautiful	t	B	2025-08-31 06:48:05.607	2025-08-31 06:48:05.607
+120	30	most beautiful	f	C	2025-08-31 06:48:05.618	2025-08-31 06:48:05.618
+121	30	beautifuller	f	D	2025-08-31 06:48:05.63	2025-08-31 06:48:05.63
+122	31	stay	f	A	2025-08-31 06:48:05.655	2025-08-31 06:48:05.655
+123	31	stays	f	B	2025-08-31 06:48:05.667	2025-08-31 06:48:05.667
+124	31	will stay	t	C	2025-08-31 06:48:05.679	2025-08-31 06:48:05.679
+125	31	stayed	f	D	2025-08-31 06:48:05.691	2025-08-31 06:48:05.691
+126	32	watch	f	A	2025-08-31 06:48:05.715	2025-08-31 06:48:05.715
+127	32	was watching	t	B	2025-08-31 06:48:05.728	2025-08-31 06:48:05.728
+128	32	watched	f	C	2025-08-31 06:48:05.74	2025-08-31 06:48:05.74
+129	32	watches	f	D	2025-08-31 06:48:05.751	2025-08-31 06:48:05.751
+130	33	for	f	A	2025-08-31 06:48:05.774	2025-08-31 06:48:05.774
+131	33	since	t	B	2025-08-31 06:48:05.787	2025-08-31 06:48:05.787
+132	33	at	f	C	2025-08-31 06:48:05.798	2025-08-31 06:48:05.798
+133	33	on	f	D	2025-08-31 06:48:05.809	2025-08-31 06:48:05.809
+134	34	by	t	A	2025-08-31 06:48:05.833	2025-08-31 06:48:05.833
+135	34	from	f	B	2025-08-31 06:48:05.845	2025-08-31 06:48:05.845
+136	34	with	f	C	2025-08-31 06:48:05.857	2025-08-31 06:48:05.857
+137	34	to	f	D	2025-08-31 06:48:05.869	2025-08-31 06:48:05.869
+138	35	doesn't go	f	A	2025-08-31 06:48:59.657	2025-08-31 06:48:59.657
+139	35	won't go	f	B	2025-08-31 06:48:59.669	2025-08-31 06:48:59.669
+140	35	didn't go	t	C	2025-08-31 06:48:59.678	2025-08-31 06:48:59.678
+141	35	hasn't gone	f	D	2025-08-31 06:48:59.688	2025-08-31 06:48:59.688
+142	36	am	f	A	2025-08-31 06:48:59.707	2025-08-31 06:48:59.707
+143	36	was	t	B	2025-08-31 06:48:59.716	2025-08-31 06:48:59.716
+144	36	were	f	C	2025-08-31 06:48:59.726	2025-08-31 06:48:59.726
+145	36	be	f	D	2025-08-31 06:48:59.735	2025-08-31 06:48:59.735
+146	37	which	f	A	2025-08-31 06:48:59.75	2025-08-31 06:48:59.75
+147	37	who	t	B	2025-08-31 06:48:59.757	2025-08-31 06:48:59.757
+148	37	whom	f	C	2025-08-31 06:48:59.764	2025-08-31 06:48:59.764
+149	37	where	f	D	2025-08-31 06:48:59.77	2025-08-31 06:48:59.77
+150	38	will finish	f	A	2025-08-31 06:48:59.783	2025-08-31 06:48:59.783
+151	38	have finished	f	B	2025-08-31 06:48:59.79	2025-08-31 06:48:59.79
+152	38	will have finished	t	C	2025-08-31 06:48:59.797	2025-08-31 06:48:59.797
+153	38	are finishing	f	D	2025-08-31 06:48:59.803	2025-08-31 06:48:59.803
+154	39	is	f	A	2025-08-31 06:48:59.816	2025-08-31 06:48:59.816
+155	39	are	f	B	2025-08-31 06:48:59.824	2025-08-31 06:48:59.824
+156	39	be	t	C	2025-08-31 06:48:59.831	2025-08-31 06:48:59.831
+157	39	was	f	D	2025-08-31 06:48:59.837	2025-08-31 06:48:59.837
+158	40	stay	t	A	2025-08-31 06:48:59.848	2025-08-31 06:48:59.848
+159	40	staying	f	B	2025-08-31 06:48:59.854	2025-08-31 06:48:59.854
+160	40	to stay	f	C	2025-08-31 06:48:59.862	2025-08-31 06:48:59.862
+161	40	stayed	f	D	2025-08-31 06:48:59.869	2025-08-31 06:48:59.869
+162	41	live	t	A	2025-08-31 06:48:59.882	2025-08-31 06:48:59.882
+163	41	lives	f	B	2025-08-31 06:48:59.888	2025-08-31 06:48:59.888
+164	41	living	f	C	2025-08-31 06:48:59.893	2025-08-31 06:48:59.893
+165	41	to live	f	D	2025-08-31 06:48:59.899	2025-08-31 06:48:59.899
+166	42	go	f	A	2025-08-31 06:48:59.911	2025-08-31 06:48:59.911
+167	42	went	f	B	2025-08-31 06:48:59.917	2025-08-31 06:48:59.917
+168	42	had gone	t	C	2025-08-31 06:48:59.922	2025-08-31 06:48:59.922
+169	42	was going	f	D	2025-08-31 06:48:59.927	2025-08-31 06:48:59.927
+170	43	have	f	A	2025-08-31 06:48:59.938	2025-08-31 06:48:59.938
+171	43	had	t	B	2025-08-31 06:48:59.943	2025-08-31 06:48:59.943
+172	43	has	f	C	2025-08-31 06:48:59.948	2025-08-31 06:48:59.948
+173	43	having	f	D	2025-08-31 06:48:59.954	2025-08-31 06:48:59.954
+174	44	ever saw	f	A	2025-08-31 06:48:59.964	2025-08-31 06:48:59.964
+175	44	have ever seen	t	B	2025-08-31 06:48:59.97	2025-08-31 06:48:59.97
+176	44	had ever see	f	C	2025-08-31 06:48:59.978	2025-08-31 06:48:59.978
+177	44	see	f	D	2025-08-31 06:48:59.984	2025-08-31 06:48:59.984
+178	45	studied	f	A	2025-08-31 06:50:23.281	2025-08-31 06:50:23.281
+179	45	had studied	t	B	2025-08-31 06:50:23.288	2025-08-31 06:50:23.288
+180	45	was studying	f	C	2025-08-31 06:50:23.297	2025-08-31 06:50:23.297
+181	45	would study	f	D	2025-08-31 06:50:23.304	2025-08-31 06:50:23.304
+182	46	had I left	t	A	2025-08-31 06:50:23.318	2025-08-31 06:50:23.318
+183	46	I had left	f	B	2025-08-31 06:50:23.326	2025-08-31 06:50:23.326
+184	46	did I leave	f	C	2025-08-31 06:50:23.334	2025-08-31 06:50:23.334
+185	46	I left	f	D	2025-08-31 06:50:23.341	2025-08-31 06:50:23.341
+186	47	who	t	A	2025-08-31 06:50:23.355	2025-08-31 06:50:23.355
+187	47	whom	f	B	2025-08-31 06:50:23.362	2025-08-31 06:50:23.362
+188	47	which	f	C	2025-08-31 06:50:23.37	2025-08-31 06:50:23.37
+189	47	what	f	D	2025-08-31 06:50:23.377	2025-08-31 06:50:23.377
+190	48	Although	f	A	2025-08-31 06:50:23.391	2025-08-31 06:50:23.391
+191	48	Being	t	B	2025-08-31 06:50:23.4	2025-08-31 06:50:23.4
+192	48	Because	f	C	2025-08-31 06:50:23.409	2025-08-31 06:50:23.409
+193	48	Unless	f	D	2025-08-31 06:50:23.417	2025-08-31 06:50:23.417
+194	49	have	f	A	2025-08-31 06:50:23.433	2025-08-31 06:50:23.433
+195	49	had	t	B	2025-08-31 06:50:23.44	2025-08-31 06:50:23.44
+196	49	would have	f	C	2025-08-31 06:50:23.449	2025-08-31 06:50:23.449
+197	49	will have	f	D	2025-08-31 06:50:23.457	2025-08-31 06:50:23.457
+198	50	should have	t	A	2025-08-31 06:50:23.477	2025-08-31 06:50:23.477
+199	50	must have	f	B	2025-08-31 06:50:23.484	2025-08-31 06:50:23.484
+200	50	might	f	C	2025-08-31 06:50:23.494	2025-08-31 06:50:23.494
+201	50	could	f	D	2025-08-31 06:50:23.504	2025-08-31 06:50:23.504
+202	51	did he write	t	A	2025-08-31 06:50:23.526	2025-08-31 06:50:23.526
+203	51	he wrote	f	B	2025-08-31 06:50:23.537	2025-08-31 06:50:23.537
+204	51	has he written	f	C	2025-08-31 06:50:23.55	2025-08-31 06:50:23.55
+205	51	was he writing	f	D	2025-08-31 06:50:23.561	2025-08-31 06:50:23.561
+206	52	catch	f	A	2025-08-31 06:50:23.587	2025-08-31 06:50:23.587
+207	52	caught	f	B	2025-08-31 06:50:23.6	2025-08-31 06:50:23.6
+208	52	had caught	t	C	2025-08-31 06:50:23.611	2025-08-31 06:50:23.611
+209	52	would catch	f	D	2025-08-31 06:50:23.623	2025-08-31 06:50:23.623
+210	53	had we entered	t	A	2025-08-31 06:50:23.652	2025-08-31 06:50:23.652
+211	53	we had entered	f	B	2025-08-31 06:50:23.658	2025-08-31 06:50:23.658
+212	53	did we enter	f	C	2025-08-31 06:50:23.663	2025-08-31 06:50:23.663
+213	53	entered we	f	D	2025-08-31 06:50:23.669	2025-08-31 06:50:23.669
+214	54	whose	t	A	2025-08-31 06:50:23.68	2025-08-31 06:50:23.68
+215	54	who	f	B	2025-08-31 06:50:23.686	2025-08-31 06:50:23.686
+216	54	whom	f	C	2025-08-31 06:50:23.692	2025-08-31 06:50:23.692
+217	54	which	f	D	2025-08-31 06:50:23.698	2025-08-31 06:50:23.698
+228	66	eat	f	A	2025-09-07 13:24:48.765	2025-09-07 13:24:48.765
+229	66	eats	t	B	2025-09-07 13:24:48.78	2025-09-07 13:24:48.78
+230	66	eating	f	C	2025-09-07 13:24:48.793	2025-09-07 13:24:48.793
+231	66	ate	f	D	2025-09-07 13:24:48.807	2025-09-07 13:24:48.807
+232	67	rise	f	A	2025-09-07 13:24:48.832	2025-09-07 13:24:48.832
+233	67	rises	t	B	2025-09-07 13:24:48.845	2025-09-07 13:24:48.845
+234	67	rising	f	C	2025-09-07 13:24:48.856	2025-09-07 13:24:48.856
+235	67	rose	f	D	2025-09-07 13:24:48.869	2025-09-07 13:24:48.869
+236	68	goes	f	A	2025-09-07 13:24:48.897	2025-09-07 13:24:48.897
+237	68	go	t	B	2025-09-07 13:24:48.91	2025-09-07 13:24:48.91
+238	68	going	f	C	2025-09-07 13:24:48.921	2025-09-07 13:24:48.921
+239	68	gone	f	D	2025-09-07 13:24:48.934	2025-09-07 13:24:48.934
+240	69	don’t drink	t	A	2025-09-07 13:24:48.956	2025-09-07 13:24:48.956
+241	69	doesn’t drink	f	B	2025-09-07 13:24:48.967	2025-09-07 13:24:48.967
+242	69	didn’t drink	f	C	2025-09-07 13:24:48.981	2025-09-07 13:24:48.981
+243	69	drinking	f	D	2025-09-07 13:24:48.995	2025-09-07 13:24:48.995
+244	70	listen	f	A	2025-09-07 13:24:49.023	2025-09-07 13:24:49.023
+245	70	listens	t	B	2025-09-07 13:24:49.035	2025-09-07 13:24:49.035
+246	70	listening	f	C	2025-09-07 13:24:49.048	2025-09-07 13:24:49.048
+247	70	listened	f	D	2025-09-07 13:24:49.06	2025-09-07 13:24:49.06
+248	71	do	t	A	2025-09-07 13:24:49.089	2025-09-07 13:24:49.089
+249	71	does	f	B	2025-09-07 13:24:49.104	2025-09-07 13:24:49.104
+250	71	did	f	C	2025-09-07 13:24:49.117	2025-09-07 13:24:49.117
+251	71	done	f	D	2025-09-07 13:24:49.13	2025-09-07 13:24:49.13
+252	72	drive	f	A	2025-09-07 13:24:49.157	2025-09-07 13:24:49.157
+253	72	drives	t	B	2025-09-07 13:24:49.169	2025-09-07 13:24:49.169
+254	72	driving	f	C	2025-09-07 13:24:49.183	2025-09-07 13:24:49.183
+255	72	drove	f	D	2025-09-07 13:24:49.197	2025-09-07 13:24:49.197
+256	73	fly	t	A	2025-09-07 13:24:49.223	2025-09-07 13:24:49.223
+257	73	flies	f	B	2025-09-07 13:24:49.235	2025-09-07 13:24:49.235
+258	73	flying	f	C	2025-09-07 13:24:49.246	2025-09-07 13:24:49.246
+259	73	flown	f	D	2025-09-07 13:24:49.258	2025-09-07 13:24:49.258
+260	74	do	f	A	2025-09-07 13:24:49.284	2025-09-07 13:24:49.284
+261	74	does	t	B	2025-09-07 13:24:49.295	2025-09-07 13:24:49.295
+262	74	did	f	C	2025-09-07 13:24:49.306	2025-09-07 13:24:49.306
+263	74	is	f	D	2025-09-07 13:24:49.318	2025-09-07 13:24:49.318
+264	75	leave	f	A	2025-09-07 13:24:49.343	2025-09-07 13:24:49.343
+265	75	leaves	t	B	2025-09-07 13:24:49.357	2025-09-07 13:24:49.357
+266	75	leaving	f	C	2025-09-07 13:24:49.369	2025-09-07 13:24:49.369
+267	75	left	f	D	2025-09-07 13:24:49.381	2025-09-07 13:24:49.381
+\.
+
+
+--
+-- Data for Name: blog_categories; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.blog_categories (id, "categoryName", description, slug, "orderIndex", "isActive", "createdAt", "updatedAt") FROM stdin;
+1	English Tips	Các mẹo học tiếng Anh hiệu quả	english-tips	1	t	2025-08-23 01:46:53.995	2025-08-23 01:46:53.995
+\.
+
+
+--
+-- Data for Name: blog_comments; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.blog_comments (id, "blogPostId", "userId", content, "parentCommentId", "isActive", "createdAt", "updatedAt") FROM stdin;
+\.
+
+
+--
+-- Data for Name: blog_posts; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.blog_posts (id, title, slug, excerpt, content, "featuredImage", "authorId", "categoryId", status, "viewCount", "seoKeywords", "seoDescription", "publishedAt", "createdAt", "updatedAt") FROM stdin;
+1	10 Tips to Improve Your English Speaking Skills	10-tips-improve-english-speaking-skills	Discover effective techniques to enhance your English speaking abilities...	Speaking English fluently is a goal for many language learners...	\N	4	1	Published	0	\N	\N	2025-08-23 01:49:16.595	2025-08-23 01:49:16.597	2025-08-23 01:49:16.597
+\.
+
+
+--
+-- Data for Name: course_enrollments; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.course_enrollments (id, "userId", "courseId", status, "enrolledAt", "completedAt", "createdAt", "updatedAt") FROM stdin;
+\.
+
+
+--
+-- Data for Name: course_lessons; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.course_lessons (id, "sectionId", title, "contentType", "contentUrl", duration, "orderIndex", "isPreview", "createdAt", "updatedAt") FROM stdin;
+\.
+
+
+--
+-- Data for Name: course_progress; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.course_progress (id, "enrollmentId", "lessonId", "isCompleted", "completedAt", "createdAt", "updatedAt") FROM stdin;
+\.
+
+
+--
+-- Data for Name: course_sections; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.course_sections (id, "courseId", title, "orderIndex", "createdAt", "updatedAt") FROM stdin;
+1	1	Test thôi hahaha	1	2025-09-16 14:55:24.674	2025-09-16 14:55:24.674
+2	1	Test lần 2	2	2025-09-16 14:55:37.108	2025-09-16 14:55:37.108
+\.
+
+
+--
+-- Data for Name: courses; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.courses (id, title, slug, description, "coverImage", price, "discountPrice", level, language, "isPublished", "publishedAt", "createdAt", "updatedAt") FROM stdin;
+1	Khóa hoc test	test-hihi	Khóa học để test thoi hahahahahah	https://cdn-icons-png.flaticon.com/128/3038/3038168.png	100000	0	Beginner	English	f	\N	2025-09-16 14:54:37.474	2025-09-16 14:54:37.474
+\.
+
+
+--
+-- Data for Name: exam_attempts; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.exam_attempts (id, "userId", "examId", score, "totalQuestions", "correctAnswers", "timeSpent", status, "detailedResult", "startedAt", "completedAt", "createdAt", "updatedAt") FROM stdin;
+2	4	3	100	1	1	0	Completed	[{"points": 1, "isCorrect": true, "questionId": 1, "correctOption": "A", "selectedOption": "A"}]	2025-08-24 06:58:21.327	2025-08-24 06:58:21.36	2025-08-24 06:58:21.327	2025-08-24 06:58:21.363
+3	4	3	0	1	0	0	Completed	[{"points": 0, "isCorrect": false, "questionId": 1, "correctOption": "A", "selectedOption": "B"}]	2025-08-24 07:05:04.204	2025-08-24 07:05:04.241	2025-08-24 07:05:04.204	2025-08-24 07:05:04.244
+12	4	8	25	4	1	\N	Completed	[{"points": 1, "isCorrect": true, "questionId": 21, "correctOption": "B", "selectedOption": "B"}, {"points": 0, "isCorrect": false, "questionId": 22, "correctOption": "B", "selectedOption": "D"}, {"points": 0, "isCorrect": false, "questionId": 23, "correctOption": "C", "selectedOption": "D"}, {"points": 0, "isCorrect": false, "questionId": 24, "correctOption": "B", "selectedOption": "C"}]	2025-09-03 13:22:57.61	2025-09-03 13:23:14.109	2025-09-03 13:22:57.61	2025-09-03 13:23:14.112
+\.
+
+
+--
+-- Data for Name: exams; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.exams (id, title, description, duration, difficulty, "isActive", "createdAt", "updatedAt", type) FROM stdin;
+3	English Grammar Test - Level 1	Bài kiểm tra ngữ pháp tiếng Anh cơ bản	60	Easy	t	2025-08-20 02:22:05.709	2025-08-20 02:22:05.709	TOEIC
+4	English Grammar Test Level 2 – Elementary	Dành cho người học ở trình độ sơ cấp. Bao gồm thì quá khứ đơn, tương lai đơn, động từ khuyết thiếu (can, will), so sánh hơn, mạo từ, và các cấu trúc câu khẳng định – phủ định – nghi vấn.	60	Easy	t	2025-08-31 00:31:23.103	2025-08-31 00:31:23.103	TOEIC
+5	English Grammar Test - Level 3 – Pre-Intermediate	Dành cho người đã có nền tảng vững. Bao gồm thì hiện tại hoàn thành, quá khứ hoàn thành, câu điều kiện loại 1, bị động, giới từ chỉ thời gian (for/since), và các động từ khuyết thiếu (should/must).	60	Medium	t	2025-08-31 00:33:11.635	2025-08-31 00:33:11.635	TOEIC
+6	English Grammar Test - Level 4 – Intermediate	Trình độ trung cấp. Kiểm tra kiến thức nâng cao hơn: câu tường thuật (reported speech), điều kiện loại 2, mệnh đề quan hệ, thì tương lai hoàn thành, cấu trúc giả định (subjunctive), và cách dùng “would rather / used to”.	60	Medium	t	2025-08-31 00:33:53.871	2025-08-31 00:33:53.871	TOEIC
+7	English Grammar Test - Level 5 – Upper-Intermediate / Advanced	Trình độ nâng cao. Bao gồm điều kiện loại 3, câu đảo ngữ (inversion), câu chẻ (cleft sentence), mệnh đề phân từ (participle clause), cấu trúc giả định với “wish / if only”, động từ khuyết thiếu nâng cao (must have / might have / should have), và cấu trúc nhấn mạnh “not only / hardly / scarcely”.	60	Hard	t	2025-08-31 00:34:48.901	2025-08-31 00:34:48.901	TOEIC
+8	Test Import data	cái này để test nhe shahahahaha	60	Easy	t	2025-08-31 01:18:15.869	2025-08-31 01:18:15.869	TOEIC
+13	Present Simple Tense Exam	This exam tests your understanding of the Present Simple tense, including its structure, uses, and common signal words.	60	Easy	t	2025-09-07 13:23:58.724	2025-09-07 13:23:58.724	GRAMMAR
+\.
+
+
+--
+-- Data for Name: grammar; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.grammar (id, title, content, "difficultyLevel", "orderIndex", "isActive", "createdAt", "updatedAt") FROM stdin;
+1	Present Simple Tense	Present Simple is used to describe habits, general truths, and repeated actions. Form: Subject + Verb (base form) + Object	Easy	1	t	2025-08-20 11:44:27.256	2025-08-20 11:44:27.256
+2	Present Continuous Tense	Use: Actions happening now or around now, temporary situations.\nForm: Subject + am/is/are + Verb-ing + Object\nExample: I am reading a book now.	Easy	0	t	2025-09-07 13:02:18.471	2025-09-07 13:02:18.471
+3	Present Perfect Tense	Use: Actions that happened in the past but are connected to the present.\nForm: Subject + have/has + Past Participle (V3) + Object\nExample: He has finished his homework.	Easy	0	t	2025-09-07 13:06:51.6	2025-09-07 13:06:51.6
+4	Present Perfect Continuous	Use: Actions that started in the past and continue until now (focus on duration).\nForm: Subject + have/has + been + Verb-ing + Object\nExample: They have been working for 3 hours.	Easy	0	t	2025-09-07 13:30:17.815	2025-09-07 13:30:17.815
+5	Past Simple Tense	Use: Completed actions in the past, specific time mentioned.\nForm: Subject + Verb (V2/ed) + Object\nExample: I visited Hanoi last year.	Easy	0	t	2025-09-07 13:31:29.837	2025-09-07 13:31:29.837
+6	Past Continuous Tense	Use: Actions in progress at a specific time in the past.\nForm: Subject + was/were + Verb-ing + Object\nExample: She was watching TV at 8 pm yesterday.	Easy	0	t	2025-09-07 13:32:19.252	2025-09-07 13:32:19.252
+7	Past Perfect Tense	Use: Action that happened before another action in the past.\nForm: Subject + had + Past Participle (V3) + Object\nExample: I had eaten before he came.	Easy	0	t	2025-09-07 13:49:40.994	2025-09-07 13:49:40.994
+\.
+
+
+--
+-- Data for Name: grammar_examples; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.grammar_examples (id, "grammarId", "englishSentence", "vietnameseSentence", explanation, "createdAt", "updatedAt") FROM stdin;
+1	1	I go to school every day.	Tôi đi học mỗi ngày.	Câu này sử dụng thì hiện tại đơn để diễn tả thói quen hàng ngày.	2025-08-23 00:57:55.167	2025-08-23 00:57:55.167
+\.
+
+
+--
+-- Data for Name: learning_paths; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.learning_paths (id, "pathName", description, "coverImage", "targetLevel", "estimatedWeeks", "orderIndex", "isActive", "createdAt", "updatedAt") FROM stdin;
+\.
+
+
+--
+-- Data for Name: order_items; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.order_items (id, "orderId", "courseId", price, quantity, "createdAt") FROM stdin;
+\.
+
+
+--
+-- Data for Name: orders; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.orders (id, "userId", status, "totalAmount", currency, "paymentMethod", "paymentId", "createdAt", "updatedAt") FROM stdin;
+\.
+
+
+--
+-- Data for Name: path_steps; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.path_steps (id, "learningPathId", "stepName", description, "contentType", "contentId", "orderIndex", "isRequired", "estimatedMinutes", "createdAt", "updatedAt") FROM stdin;
+\.
+
+
+--
+-- Data for Name: payments; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.payments (id, "userId", "courseId", amount, status, "paymentMethod", "transactionId", "paidAt", "createdAt", "updatedAt", "orderId") FROM stdin;
+\.
+
+
+--
+-- Data for Name: questions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.questions (id, "examId", content, "questionType", "orderIndex", points, "createdAt", "updatedAt", "grammarId") FROM stdin;
+1	3	What is the correct form of the verb 'to be' in this sentence: 'I ___ a student'?	MultipleChoice	1	1	2025-08-20 11:22:43.066	2025-08-20 11:22:43.066	\N
+2	3	Can you share some examples of your past ______?	MultipleChoice	4	1	2025-08-25 15:28:01.396	2025-08-25 15:28:01.396	\N
+3	3	She ___ my best friend.	MultipleChoice	4	1	2025-08-30 13:30:40.737	2025-08-30 13:30:40.737	\N
+4	3	Which sentence is correct?	MultipleChoice	4	1	2025-08-30 13:35:38.489	2025-08-30 13:35:38.489	\N
+5	3	I ___ from Vietnam.	MultipleChoice	4	1	2025-08-30 13:37:45.632	2025-08-30 13:37:45.632	\N
+6	3	I have ___ apple.	MultipleChoice	4	1	2025-08-30 13:44:56.54	2025-08-30 13:44:56.54	\N
+7	3	Which is the correct negative form?	MultipleChoice	4	1	2025-08-30 13:51:21.75	2025-08-30 13:51:21.75	\N
+8	3	The cat is ___ the table.	MultipleChoice	1	1	2025-08-30 13:58:19.978	2025-08-30 13:58:19.978	\N
+9	3	Which word is a pronoun?	MultipleChoice	4	1	2025-08-30 14:02:15.513	2025-08-30 14:02:15.513	\N
+10	3	Which is the correct plural form?	MultipleChoice	4	1	2025-08-30 14:07:36.134	2025-08-30 14:07:36.134	\N
+11	4	Question 1: Yesterday I ___ to the park.	MultipleChoice	1	1	2025-08-31 01:06:27.972	2025-08-31 01:06:27.972	\N
+12	4	Question 2: He ___ sing well.	MultipleChoice	2	1	2025-08-31 01:06:28.045	2025-08-31 01:06:28.045	\N
+13	4	Question 3: There ___ some books on the table.	MultipleChoice	3	1	2025-08-31 01:06:28.08	2025-08-31 01:06:28.08	\N
+14	4	Question 4: This car is ___ than that one.	MultipleChoice	4	1	2025-08-31 01:06:28.117	2025-08-31 01:06:28.117	\N
+15	4	Question 5: She will ___ to school.	MultipleChoice	5	1	2025-08-31 01:06:28.153	2025-08-31 01:06:28.153	\N
+16	4	Question 6: We ___ TV last night.	MultipleChoice	6	1	2025-08-31 01:06:28.193	2025-08-31 01:06:28.193	\N
+17	4	Question 7: He is ___ honest man.	MultipleChoice	7	1	2025-08-31 01:06:28.247	2025-08-31 01:06:28.247	\N
+18	4	Question 8: Which sentence is correct?	MultipleChoice	8	1	2025-08-31 01:06:28.307	2025-08-31 01:06:28.307	\N
+19	4	Question 9: I ___ my homework yesterday.	MultipleChoice	9	1	2025-08-31 01:06:28.324	2025-08-31 01:06:28.324	\N
+20	4	Question 10: Which is the correct question?	MultipleChoice	10	1	2025-08-31 01:06:28.368	2025-08-31 01:06:28.368	\N
+21	8	Question 1: She ___ my best friend.	MultipleChoice	1	1	2025-08-31 01:50:42.205	2025-08-31 01:50:42.205	\N
+22	8	Question 2: He ___ to school every day.	MultipleChoice	2	1	2025-08-31 01:50:42.277	2025-08-31 01:50:42.277	\N
+23	8	Question 3: I ___ from Vietnam.	MultipleChoice	3	1	2025-08-31 01:50:42.313	2025-08-31 01:50:42.313	\N
+24	8	Question 4: I have ___ apple.	MultipleChoice	4	1	2025-08-31 01:50:42.345	2025-08-31 01:50:42.345	\N
+25	5	Question 1: They ___ playing football now.	MultipleChoice	1	1	2025-08-31 06:48:05.36	2025-08-31 06:48:05.36	\N
+26	5	Question 2: I usually ___ breakfast at 7 a.m.	MultipleChoice	2	1	2025-08-31 06:48:05.431	2025-08-31 06:48:05.431	\N
+27	5	Question 3: She can ___ the guitar very well.	MultipleChoice	3	1	2025-08-31 06:48:05.461	2025-08-31 06:48:05.461	\N
+28	5	Question 4: There are ___ books on the table.	MultipleChoice	4	1	2025-08-31 06:48:05.493	2025-08-31 06:48:05.493	\N
+29	5	Question 5: We ___ to the park yesterday.	MultipleChoice	5	1	2025-08-31 06:48:05.53	2025-08-31 06:48:05.53	\N
+30	5	Question 6: This dress is ___ than that one.	MultipleChoice	6	1	2025-08-31 06:48:05.584	2025-08-31 06:48:05.584	\N
+31	5	Question 7: If it rains, we ___ at home.	MultipleChoice	7	1	2025-08-31 06:48:05.642	2025-08-31 06:48:05.642	\N
+32	5	Question 8: He ___ TV when I called him.	MultipleChoice	8	1	2025-08-31 06:48:05.704	2025-08-31 06:48:05.704	\N
+33	5	Question 9: They have lived here ___ 2010.	MultipleChoice	9	1	2025-08-31 06:48:05.763	2025-08-31 06:48:05.763	\N
+34	5	Question 10: The book was written ___ J.K. Rowling.	MultipleChoice	10	1	2025-08-31 06:48:05.82	2025-08-31 06:48:05.82	\N
+35	6	Question 1: She said that she ___ to the party.	MultipleChoice	1	1	2025-08-31 06:48:59.63	2025-08-31 06:48:59.63	\N
+36	6	Question 2: If I ___ you, I would study harder.	MultipleChoice	2	1	2025-08-31 06:48:59.697	2025-08-31 06:48:59.697	\N
+37	6	Question 3: The man ___ lives next door is very friendly.	MultipleChoice	3	1	2025-08-31 06:48:59.743	2025-08-31 06:48:59.743	\N
+38	6	Question 4: By next year, they ___ their new house.	MultipleChoice	4	1	2025-08-31 06:48:59.776	2025-08-31 06:48:59.776	\N
+39	6	Question 5: It is important that every student ___ on time.	MultipleChoice	5	1	2025-08-31 06:48:59.81	2025-08-31 06:48:59.81	\N
+40	6	Question 6: I would rather ___ at home than go out tonight.	MultipleChoice	6	1	2025-08-31 06:48:59.843	2025-08-31 06:48:59.843	\N
+41	6	Question 7: She used to ___ in the countryside when she was young.	MultipleChoice	7	1	2025-08-31 06:48:59.876	2025-08-31 06:48:59.876	\N
+42	6	Question 8: He asked me where I ___ the day before.	MultipleChoice	8	1	2025-08-31 06:48:59.906	2025-08-31 06:48:59.906	\N
+43	6	Question 9: If they ___ more money, they could travel abroad.	MultipleChoice	9	1	2025-08-31 06:48:59.932	2025-08-31 06:48:59.932	\N
+44	6	Question 10: This is the best film that I ___.	MultipleChoice	10	1	2025-08-31 06:48:59.959	2025-08-31 06:48:59.959	\N
+45	7	Question 1: If he ___ harder, he would have passed the exam.	MultipleChoice	1	1	2025-08-31 06:50:23.259	2025-08-31 06:50:23.259	\N
+46	7	Question 2: Hardly ___ the bus when it started to rain.	MultipleChoice	2	1	2025-08-31 06:50:23.311	2025-08-31 06:50:23.311	\N
+47	7	Question 3: It was Mary ___ helped me with my homework.	MultipleChoice	3	1	2025-08-31 06:50:23.348	2025-08-31 06:50:23.348	\N
+48	7	Question 4: ___ tired, she continued working on her project.	MultipleChoice	4	1	2025-08-31 06:50:23.383	2025-08-31 06:50:23.383	\N
+49	7	Question 5: I wish I ___ more time to finish this task.	MultipleChoice	5	1	2025-08-31 06:50:23.425	2025-08-31 06:50:23.425	\N
+50	7	Question 6: You ___ told me about the meeting earlier.	MultipleChoice	6	1	2025-08-31 06:50:23.468	2025-08-31 06:50:23.468	\N
+51	7	Question 7: Not only ___ the report, but he also presented it very well.	MultipleChoice	7	1	2025-08-31 06:50:23.515	2025-08-31 06:50:23.515	\N
+52	7	Question 8: If only I ___ the train! Now I’m late.	MultipleChoice	8	1	2025-08-31 06:50:23.574	2025-08-31 06:50:23.574	\N
+53	7	Question 9: Scarcely ___ the class when the teacher began the test.	MultipleChoice	9	1	2025-08-31 06:50:23.639	2025-08-31 06:50:23.639	\N
+54	7	Question 10: That’s the man ___ car was stolen last night.	MultipleChoice	10	1	2025-08-31 06:50:23.675	2025-08-31 06:50:23.675	\N
+66	13	She usually ___ breakfast at 7 a.m.	MultipleChoice	1	1	2025-09-07 13:24:48.736	2025-09-07 13:24:48.736	\N
+67	13	The sun ___ in the east.	MultipleChoice	2	1	2025-09-07 13:24:48.82	2025-09-07 13:24:48.82	\N
+68	13	I ___ to the gym every weekend.	MultipleChoice	3	1	2025-09-07 13:24:48.883	2025-09-07 13:24:48.883	\N
+69	13	They ___ coffee, but they like tea.	MultipleChoice	4	1	2025-09-07 13:24:48.945	2025-09-07 13:24:48.945	\N
+70	13	He ___ to music in his free time.	MultipleChoice	5	1	2025-09-07 13:24:49.008	2025-09-07 13:24:49.008	\N
+71	13	We ___ our homework every day.	MultipleChoice	6	1	2025-09-07 13:24:49.075	2025-09-07 13:24:49.075	\N
+72	13	My father ___ to work by car.	MultipleChoice	7	1	2025-09-07 13:24:49.145	2025-09-07 13:24:49.145	\N
+73	13	Birds ___ in the sky.	MultipleChoice	8	1	2025-09-07 13:24:49.211	2025-09-07 13:24:49.211	\N
+74	13	She ___ not like spicy food.	MultipleChoice	9	1	2025-09-07 13:24:49.271	2025-09-07 13:24:49.271	\N
+75	13	The train ___ at 9 o’clock every morning.	MultipleChoice	10	1	2025-09-07 13:24:49.331	2025-09-07 13:24:49.331	\N
+\.
+
+
+--
+-- Data for Name: roles; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.roles (id, "roleName", description, "createdAt", "updatedAt") FROM stdin;
+2	Admin	Có quyền cao nhất	2025-08-17 06:49:58.21	2025-08-17 06:49:58.21
+3	Teacher	Có quyền chỉnh sửa thông tin	2025-08-17 06:49:58.21	2025-08-17 06:49:58.21
+4	Student	Người dùng	2025-08-17 06:49:58.21	2025-08-17 06:49:58.21
+\.
+
+
+--
+-- Data for Name: user_grammar_progress; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.user_grammar_progress (id, "userId", "grammarId", status, "masteryLevel", "timesPracticed", "lastPracticedAt", "firstLearnedAt", "createdAt", "updatedAt") FROM stdin;
+1	4	1	Learning	15	1	2025-08-23 01:39:51.958	2025-08-23 01:23:20.99	2025-08-23 01:23:20.99	2025-08-23 01:39:51.959
+\.
+
+
+--
+-- Data for Name: user_learning_paths; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.user_learning_paths (id, "userId", "learningPathId", status, progress, "startedAt", "completedAt", "createdAt", "updatedAt") FROM stdin;
+\.
+
+
+--
+-- Data for Name: user_vocabulary_progress; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.user_vocabulary_progress (id, "userId", "vocabularyId", status, "masteryLevel", "timesPracticed", "lastPracticedAt", "firstLearnedAt", "createdAt", "updatedAt") FROM stdin;
+1	4	1	Mastered	85	2	2025-08-19 08:09:01.802	2025-08-19 07:58:16.927	2025-08-19 07:58:16.927	2025-08-19 08:20:20.004
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users (id, email, password, "fullName", avatar, "dateOfBirth", gender, "phoneNumber", address, "isActive", "emailVerified", "roleId", status, "codeId", "codeExpired", "createdAt", "updatedAt") FROM stdin;
+4	lecongtuan472004@gmail.com	$argon2id$v=19$m=65536,t=3,p=4$uStM+jmSDFAc7NPctSej/A$Wclzc/5EsfOWG5YFlNezM/G7biIOyo90El4NQHR0mVc	Lê Công Tuấn	\N	\N	\N	\N	\N	t	f	4	active	9ca8b67f-7824-4f8b-9d57-ab903dd930d8	2025-08-17 07:40:27.195	2025-08-17 07:39:27.197	2025-08-17 07:39:27.197
+5	admin@gmail.com	$argon2id$v=19$m=65536,t=3,p=4$vieoT8Px9tRrwusAWkxFTA$8EQjztXFXdx9rjFWnkaE1YRmgDPs3iREAJALgUHsXx4	Admin	\N	\N	\N	\N	\N	t	f	2	active	94e9f8fe-feaf-40b3-926e-b67cee110032	2025-08-23 03:41:11.647	2025-08-23 03:40:11.648	2025-08-23 03:40:11.648
+21	tuansmart472004@gmail.com	$argon2id$v=19$m=65536,t=3,p=4$/8SNKW4m10mlEckdpKJnQQ$mBzuiY5b+TFCWo28maNjzHuRfor2xa9Xh+Hc801ygug	Tuan Stark	\N	\N	\N	\N	\N	t	f	4	active	5337d12f-8058-42f5-b85a-cecf255cab5c	2025-09-12 13:50:31.769	2025-09-12 13:44:43.387	2025-09-12 13:49:58.216
+6	linhvan118319@gmail.com	$argon2id$v=19$m=65536,t=3,p=4$2WgPmtbdZKBmZy98y3rP5A$blpMU9rC012muZ0Vq9r2t8Y0V9M27/jx/mx6uVBzW7g	Teacher		\N	\N	\N	\N	t	f	3	active	\N	\N	2025-08-25 14:22:16.645	2025-09-04 08:49:42.742
+\.
+
+
+--
+-- Data for Name: vocabularies; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.vocabularies (id, "topicId", "englishWord", pronunciation, "vietnameseMeaning", "wordType", "difficultyLevel", image, "audioFile", "isActive", "createdAt", "updatedAt") FROM stdin;
+63	2	food	/fuːd/	thức ăn	Noun	Easy	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+64	2	drink	/drɪŋk/	đồ uống	Noun	Easy	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+1	4	family	/ˈfæməli/	gia đình	Noun	Medium	https://example.com/family.jpg	https://example.com/family.mp3	t	2025-08-18 14:24:47.658	2025-08-25 14:28:34.123
+65	2	water	/ˈwɔːtər/	nước	Noun	Easy	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+66	2	rice	/raɪs/	cơm, gạo	Noun	Easy	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+2	4	parent	/ˈper.ənt/	ba mẹ	Noun	Medium			t	2025-08-25 14:38:55.174	2025-08-25 14:43:56.164
+5	4	father	/ˈfɑːðər/	cha, bố	Noun	Easy	\N	\N	t	2025-09-04 13:33:31.951	2025-09-04 13:33:31.951
+6	4	mother	/ˈmʌðər/	mẹ	Noun	Easy	\N	\N	t	2025-09-04 13:33:31.951	2025-09-04 13:33:31.951
+7	4	son	/sʌn/	con trai	Noun	Easy	\N	\N	t	2025-09-04 13:33:31.951	2025-09-04 13:33:31.951
+8	4	daughter	/ˈdɔːtər/	con gái	Noun	Easy	\N	\N	t	2025-09-04 13:33:31.951	2025-09-04 13:33:31.951
+9	4	brother	/ˈbrʌðər/	anh/em trai	Noun	Easy	\N	\N	t	2025-09-04 13:33:31.951	2025-09-04 13:33:31.951
+10	4	sister	/ˈsɪstər/	chị/em gái	Noun	Easy	\N	\N	t	2025-09-04 13:33:31.951	2025-09-04 13:33:31.951
+11	4	husband	/ˈhʌzbənd/	chồng	Noun	Medium	\N	\N	t	2025-09-04 13:33:31.951	2025-09-04 13:33:31.951
+12	4	wife	/waɪf/	vợ	Noun	Medium	\N	\N	t	2025-09-04 13:33:31.951	2025-09-04 13:33:31.951
+13	4	grandfather	/ˈɡrænfɑːðər/	ông nội/ngoại	Noun	Medium	\N	\N	t	2025-09-04 13:33:31.951	2025-09-04 13:33:31.951
+14	4	grandmother	/ˈɡrænmʌðər/	bà nội/ngoại	Noun	Medium	\N	\N	t	2025-09-04 13:33:31.951	2025-09-04 13:33:31.951
+15	4	grandparents	/ˈɡrænperənts/	ông bà	Noun	Medium	\N	\N	t	2025-09-04 13:33:31.951	2025-09-04 13:33:31.951
+16	4	uncle	/ˈʌŋkl/	chú/cậu/bác trai	Noun	Medium	\N	\N	t	2025-09-04 13:33:31.951	2025-09-04 13:33:31.951
+17	4	aunt	/ænt/	cô/dì/bác gái	Noun	Medium	\N	\N	t	2025-09-04 13:33:31.951	2025-09-04 13:33:31.951
+18	4	cousin	/ˈkʌzn/	anh/chị/em họ	Noun	Medium	\N	\N	t	2025-09-04 13:33:31.951	2025-09-04 13:33:31.951
+19	4	nephew	/ˈnefjuː/	cháu trai (con của anh/chị/em)	Noun	Hard	\N	\N	t	2025-09-04 13:33:31.951	2025-09-04 13:33:31.951
+20	4	niece	/niːs/	cháu gái (con của anh/chị/em)	Noun	Hard	\N	\N	t	2025-09-04 13:33:31.951	2025-09-04 13:33:31.951
+21	4	relatives	/ˈrelətɪvz/	họ hàng	Noun	Hard	\N	\N	t	2025-09-04 13:33:31.951	2025-09-04 13:33:31.951
+22	1	animal	/ˈænɪml/	động vật	Noun	Easy	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+23	1	dog	/dɔːɡ/	chó	Noun	Easy	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+24	1	cat	/kæt/	mèo	Noun	Easy	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+25	1	bird	/bɜːrd/	chim	Noun	Easy	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+26	1	fish	/fɪʃ/	cá	Noun	Easy	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+27	1	cow	/kaʊ/	bò cái	Noun	Easy	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+28	1	bull	/bʊl/	bò đực	Noun	Medium	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+29	1	chicken	/ˈtʃɪkɪn/	gà	Noun	Easy	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+30	1	duck	/dʌk/	vịt	Noun	Easy	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+31	1	pig	/pɪɡ/	lợn	Noun	Easy	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+32	1	horse	/hɔːrs/	ngựa	Noun	Easy	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+33	1	sheep	/ʃiːp/	cừu	Noun	Medium	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+34	1	goat	/ɡoʊt/	dê	Noun	Medium	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+35	1	lion	/ˈlaɪən/	sư tử	Noun	Medium	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+36	1	tiger	/ˈtaɪɡər/	hổ	Noun	Medium	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+37	1	elephant	/ˈelɪfənt/	voi	Noun	Medium	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+38	1	monkey	/ˈmʌŋki/	khỉ	Noun	Medium	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+39	1	giraffe	/dʒəˈræf/	hươu cao cổ	Noun	Hard	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+40	1	zebra	/ˈziːbrə/	ngựa vằn	Noun	Hard	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+41	1	kangaroo	/ˌkæŋɡəˈruː/	chuột túi	Noun	Hard	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+42	1	panda	/ˈpændə/	gấu trúc	Noun	Hard	\N	\N	t	2025-09-04 13:34:14.425	2025-09-04 13:34:14.425
+43	3	technology	/tekˈnɑːlədʒi/	công nghệ	Noun	Easy	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+44	3	computer	/kəmˈpjuːtər/	máy tính	Noun	Easy	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+45	3	laptop	/ˈlæptɑːp/	máy tính xách tay	Noun	Easy	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+46	3	smartphone	/ˈsmɑːrtfoʊn/	điện thoại thông minh	Noun	Easy	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+47	3	tablet	/ˈtæblət/	máy tính bảng	Noun	Easy	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+48	3	keyboard	/ˈkiːbɔːrd/	bàn phím	Noun	Easy	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+49	3	mouse	/maʊs/	chuột máy tính	Noun	Easy	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+50	3	monitor	/ˈmɑːnɪtər/	màn hình	Noun	Easy	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+51	3	internet	/ˈɪntərnet/	mạng internet	Noun	Easy	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+52	3	website	/ˈwebsaɪt/	trang web	Noun	Easy	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+53	3	software	/ˈsɔːftwer/	phần mềm	Noun	Medium	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+54	3	hardware	/ˈhɑːrdwer/	phần cứng	Noun	Medium	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+55	3	application	/ˌæplɪˈkeɪʃn/	ứng dụng	Noun	Medium	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+56	3	database	/ˈdeɪtəbeɪs/	cơ sở dữ liệu	Noun	Medium	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+57	3	network	/ˈnetwɜːrk/	mạng lưới	Noun	Medium	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+58	3	cloud computing	/klaʊd kəmˈpjuːtɪŋ/	điện toán đám mây	Noun	Hard	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+59	3	artificial intelligence	/ˌɑːrtɪˈfɪʃl ɪnˈtelɪdʒəns/	trí tuệ nhân tạo	Noun	Hard	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+60	3	virtual reality	/ˌvɜːrtʃuəl riˈæləti/	thực tế ảo	Noun	Hard	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+61	3	cybersecurity	/ˌsaɪbərsɪˈkjʊrəti/	an ninh mạng	Noun	Hard	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+62	3	blockchain	/ˈblɑːk.tʃeɪn/	chuỗi khối	Noun	Hard	\N	\N	t	2025-09-04 13:42:23.591	2025-09-04 13:42:23.591
+67	2	bread	/bred/	bánh mì	Noun	Easy	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+68	2	meat	/miːt/	thịt	Noun	Easy	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+69	2	chicken	/ˈtʃɪkɪn/	thịt gà	Noun	Easy	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+70	2	beef	/biːf/	thịt bò	Noun	Easy	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+71	2	fish	/fɪʃ/	cá	Noun	Easy	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+72	2	egg	/eɡ/	trứng	Noun	Easy	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+73	2	vegetable	/ˈvedʒtəbl/	rau củ	Noun	Easy	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+74	2	fruit	/fruːt/	trái cây	Noun	Easy	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+75	2	apple	/ˈæpl/	táo	Noun	Easy	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+76	2	banana	/bəˈnænə/	chuối	Noun	Easy	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+77	2	orange	/ˈɔːrɪndʒ/	cam	Noun	Easy	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+78	2	milk	/mɪlk/	sữa	Noun	Easy	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+79	2	juice	/dʒuːs/	nước ép	Noun	Easy	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+80	2	coffee	/ˈkɔːfi/	cà phê	Noun	Medium	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+81	2	tea	/tiː/	trà	Noun	Medium	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+82	2	soup	/suːp/	súp, canh	Noun	Medium	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+83	2	noodles	/ˈnuːdlz/	mì	Noun	Medium	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+84	2	salad	/ˈsæləd/	rau trộn	Noun	Medium	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+85	2	dessert	/dɪˈzɜːrt/	món tráng miệng	Noun	Hard	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+86	2	sandwich	/ˈsænwɪtʃ/	bánh mì kẹp	Noun	Hard	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+87	2	hamburger	/ˈhæmbɜːrɡər/	bánh mì kẹp thịt	Noun	Hard	\N	\N	t	2025-09-04 13:42:55.364	2025-09-04 13:42:55.364
+\.
+
+
+--
+-- Data for Name: vocabulary_examples; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.vocabulary_examples (id, "vocabularyId", "englishSentence", "vietnameseSentence", "audioFile", "createdAt", "updatedAt") FROM stdin;
+1	1	My family means everything to me.	Gia đình tôi rất quan trọng với tôi.	https://example.com/family-example.mp3	2025-08-19 07:42:35.917	2025-08-19 08:19:36.011
+\.
+
+
+--
+-- Data for Name: vocabulary_topics; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.vocabulary_topics (id, "topicName", description, image, "orderIndex", "isActive", "createdAt", "updatedAt") FROM stdin;
+1	Animals	Từ vựng về động vật	https://cdn-icons-png.flaticon.com/128/4322/4322991.png	1	t	2025-08-17 14:20:36.146	2025-08-17 14:20:36.146
+3	Technology	Từ vựng về công nghệ	https://cdn-icons-png.flaticon.com/128/8055/8055545.png	3	t	2025-08-17 14:20:36.146	2025-08-17 14:20:36.146
+2	Food & Drinks	Từ vựng về đồ ăn và thức uống	https://cdn-icons-png.flaticon.com/128/737/737967.png	2	t	2025-08-17 14:20:36.146	2025-08-17 14:20:36.146
+4	Family & Relationships	Từ vựng về gia đình và các mối quan hệ - Cập nhật	https://cdn-icons-png.flaticon.com/128/9386/9386762.png	1	t	2025-08-18 13:57:55.847	2025-08-19 08:10:48.624
+\.
+
+
+--
+-- Name: ai_explanations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.ai_explanations_id_seq', 1, false);
+
+
+--
+-- Name: answer_options_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.answer_options_id_seq', 267, true);
+
+
+--
+-- Name: blog_categories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.blog_categories_id_seq', 1, true);
+
+
+--
+-- Name: blog_comments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.blog_comments_id_seq', 1, false);
+
+
+--
+-- Name: blog_posts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.blog_posts_id_seq', 1, true);
+
+
+--
+-- Name: course_enrollments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.course_enrollments_id_seq', 1, false);
+
+
+--
+-- Name: course_lessons_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.course_lessons_id_seq', 1, false);
+
+
+--
+-- Name: course_progress_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.course_progress_id_seq', 1, false);
+
+
+--
+-- Name: course_sections_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.course_sections_id_seq', 2, true);
+
+
+--
+-- Name: courses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.courses_id_seq', 1, true);
+
+
+--
+-- Name: exam_attempts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.exam_attempts_id_seq', 12, true);
+
+
+--
+-- Name: exams_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.exams_id_seq', 13, true);
+
+
+--
+-- Name: grammar_examples_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.grammar_examples_id_seq', 1, true);
+
+
+--
+-- Name: grammar_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.grammar_id_seq', 7, true);
+
+
+--
+-- Name: learning_paths_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.learning_paths_id_seq', 1, false);
+
+
+--
+-- Name: order_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.order_items_id_seq', 1, false);
+
+
+--
+-- Name: orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.orders_id_seq', 1, false);
+
+
+--
+-- Name: path_steps_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.path_steps_id_seq', 1, false);
+
+
+--
+-- Name: payments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.payments_id_seq', 1, false);
+
+
+--
+-- Name: questions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.questions_id_seq', 75, true);
+
+
+--
+-- Name: roles_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.roles_id_seq', 5, true);
+
+
+--
+-- Name: user_grammar_progress_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.user_grammar_progress_id_seq', 1, true);
+
+
+--
+-- Name: user_learning_paths_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.user_learning_paths_id_seq', 1, false);
+
+
+--
+-- Name: user_vocabulary_progress_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.user_vocabulary_progress_id_seq', 1, true);
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.users_id_seq', 21, true);
+
+
+--
+-- Name: vocabularies_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.vocabularies_id_seq', 87, true);
+
+
+--
+-- Name: vocabulary_examples_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.vocabulary_examples_id_seq', 1, true);
+
+
+--
+-- Name: vocabulary_topics_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.vocabulary_topics_id_seq', 5, true);
+
+
+--
+-- Name: _prisma_migrations _prisma_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public._prisma_migrations
+    ADD CONSTRAINT _prisma_migrations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: ai_explanations ai_explanations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ai_explanations
+    ADD CONSTRAINT ai_explanations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: answer_options answer_options_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.answer_options
+    ADD CONSTRAINT answer_options_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: blog_categories blog_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.blog_categories
+    ADD CONSTRAINT blog_categories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: blog_comments blog_comments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.blog_comments
+    ADD CONSTRAINT blog_comments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: blog_posts blog_posts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.blog_posts
+    ADD CONSTRAINT blog_posts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: course_enrollments course_enrollments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.course_enrollments
+    ADD CONSTRAINT course_enrollments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: course_lessons course_lessons_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.course_lessons
+    ADD CONSTRAINT course_lessons_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: course_progress course_progress_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.course_progress
+    ADD CONSTRAINT course_progress_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: course_sections course_sections_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.course_sections
+    ADD CONSTRAINT course_sections_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: courses courses_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.courses
+    ADD CONSTRAINT courses_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: exam_attempts exam_attempts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.exam_attempts
+    ADD CONSTRAINT exam_attempts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: exams exams_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.exams
+    ADD CONSTRAINT exams_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: grammar_examples grammar_examples_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.grammar_examples
+    ADD CONSTRAINT grammar_examples_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: grammar grammar_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.grammar
+    ADD CONSTRAINT grammar_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: learning_paths learning_paths_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.learning_paths
+    ADD CONSTRAINT learning_paths_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: order_items order_items_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_items
+    ADD CONSTRAINT order_items_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: orders orders_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.orders
+    ADD CONSTRAINT orders_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: path_steps path_steps_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.path_steps
+    ADD CONSTRAINT path_steps_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: payments payments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.payments
+    ADD CONSTRAINT payments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: questions questions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.questions
+    ADD CONSTRAINT questions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: roles roles_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.roles
+    ADD CONSTRAINT roles_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_grammar_progress user_grammar_progress_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.user_grammar_progress
+    ADD CONSTRAINT user_grammar_progress_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_learning_paths user_learning_paths_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.user_learning_paths
+    ADD CONSTRAINT user_learning_paths_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_vocabulary_progress user_vocabulary_progress_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.user_vocabulary_progress
+    ADD CONSTRAINT user_vocabulary_progress_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: vocabularies vocabularies_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.vocabularies
+    ADD CONSTRAINT vocabularies_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: vocabulary_examples vocabulary_examples_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.vocabulary_examples
+    ADD CONSTRAINT vocabulary_examples_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: vocabulary_topics vocabulary_topics_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.vocabulary_topics
+    ADD CONSTRAINT vocabulary_topics_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: blog_categories_slug_key; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX blog_categories_slug_key ON public.blog_categories USING btree (slug);
+
+
+--
+-- Name: blog_posts_slug_key; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX blog_posts_slug_key ON public.blog_posts USING btree (slug);
+
+
+--
+-- Name: course_enrollments_userId_courseId_key; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX "course_enrollments_userId_courseId_key" ON public.course_enrollments USING btree ("userId", "courseId");
+
+
+--
+-- Name: course_progress_enrollmentId_lessonId_key; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX "course_progress_enrollmentId_lessonId_key" ON public.course_progress USING btree ("enrollmentId", "lessonId");
+
+
+--
+-- Name: courses_slug_key; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX courses_slug_key ON public.courses USING btree (slug);
+
+
+--
+-- Name: payments_orderId_key; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX "payments_orderId_key" ON public.payments USING btree ("orderId");
+
+
+--
+-- Name: roles_roleName_key; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX "roles_roleName_key" ON public.roles USING btree ("roleName");
+
+
+--
+-- Name: user_grammar_progress_userId_grammarId_key; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX "user_grammar_progress_userId_grammarId_key" ON public.user_grammar_progress USING btree ("userId", "grammarId");
+
+
+--
+-- Name: user_learning_paths_userId_learningPathId_key; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX "user_learning_paths_userId_learningPathId_key" ON public.user_learning_paths USING btree ("userId", "learningPathId");
+
+
+--
+-- Name: user_vocabulary_progress_userId_vocabularyId_key; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX "user_vocabulary_progress_userId_vocabularyId_key" ON public.user_vocabulary_progress USING btree ("userId", "vocabularyId");
+
+
+--
+-- Name: users_email_key; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX users_email_key ON public.users USING btree (email);
+
+
+--
+-- Name: ai_explanations ai_explanations_examAttemptId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ai_explanations
+    ADD CONSTRAINT "ai_explanations_examAttemptId_fkey" FOREIGN KEY ("examAttemptId") REFERENCES public.exam_attempts(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: ai_explanations ai_explanations_questionId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ai_explanations
+    ADD CONSTRAINT "ai_explanations_questionId_fkey" FOREIGN KEY ("questionId") REFERENCES public.questions(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: answer_options answer_options_questionId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.answer_options
+    ADD CONSTRAINT "answer_options_questionId_fkey" FOREIGN KEY ("questionId") REFERENCES public.questions(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: blog_comments blog_comments_blogPostId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.blog_comments
+    ADD CONSTRAINT "blog_comments_blogPostId_fkey" FOREIGN KEY ("blogPostId") REFERENCES public.blog_posts(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: blog_comments blog_comments_parentCommentId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.blog_comments
+    ADD CONSTRAINT "blog_comments_parentCommentId_fkey" FOREIGN KEY ("parentCommentId") REFERENCES public.blog_comments(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: blog_comments blog_comments_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.blog_comments
+    ADD CONSTRAINT "blog_comments_userId_fkey" FOREIGN KEY ("userId") REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: blog_posts blog_posts_authorId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.blog_posts
+    ADD CONSTRAINT "blog_posts_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: blog_posts blog_posts_categoryId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.blog_posts
+    ADD CONSTRAINT "blog_posts_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES public.blog_categories(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: course_enrollments course_enrollments_courseId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.course_enrollments
+    ADD CONSTRAINT "course_enrollments_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES public.courses(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: course_enrollments course_enrollments_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.course_enrollments
+    ADD CONSTRAINT "course_enrollments_userId_fkey" FOREIGN KEY ("userId") REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: course_lessons course_lessons_sectionId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.course_lessons
+    ADD CONSTRAINT "course_lessons_sectionId_fkey" FOREIGN KEY ("sectionId") REFERENCES public.course_sections(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: course_progress course_progress_enrollmentId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.course_progress
+    ADD CONSTRAINT "course_progress_enrollmentId_fkey" FOREIGN KEY ("enrollmentId") REFERENCES public.course_enrollments(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: course_progress course_progress_lessonId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.course_progress
+    ADD CONSTRAINT "course_progress_lessonId_fkey" FOREIGN KEY ("lessonId") REFERENCES public.course_lessons(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: course_sections course_sections_courseId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.course_sections
+    ADD CONSTRAINT "course_sections_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES public.courses(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: exam_attempts exam_attempts_examId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.exam_attempts
+    ADD CONSTRAINT "exam_attempts_examId_fkey" FOREIGN KEY ("examId") REFERENCES public.exams(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: exam_attempts exam_attempts_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.exam_attempts
+    ADD CONSTRAINT "exam_attempts_userId_fkey" FOREIGN KEY ("userId") REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: grammar_examples grammar_examples_grammarId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.grammar_examples
+    ADD CONSTRAINT "grammar_examples_grammarId_fkey" FOREIGN KEY ("grammarId") REFERENCES public.grammar(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: order_items order_items_courseId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_items
+    ADD CONSTRAINT "order_items_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES public.courses(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: order_items order_items_orderId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_items
+    ADD CONSTRAINT "order_items_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES public.orders(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: orders orders_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.orders
+    ADD CONSTRAINT "orders_userId_fkey" FOREIGN KEY ("userId") REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: path_steps path_steps_learningPathId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.path_steps
+    ADD CONSTRAINT "path_steps_learningPathId_fkey" FOREIGN KEY ("learningPathId") REFERENCES public.learning_paths(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: payments payments_courseId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.payments
+    ADD CONSTRAINT "payments_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES public.courses(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: payments payments_orderId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.payments
+    ADD CONSTRAINT "payments_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES public.orders(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: payments payments_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.payments
+    ADD CONSTRAINT "payments_userId_fkey" FOREIGN KEY ("userId") REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: questions questions_examId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.questions
+    ADD CONSTRAINT "questions_examId_fkey" FOREIGN KEY ("examId") REFERENCES public.exams(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: questions questions_grammarId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.questions
+    ADD CONSTRAINT "questions_grammarId_fkey" FOREIGN KEY ("grammarId") REFERENCES public.grammar(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: user_grammar_progress user_grammar_progress_grammarId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.user_grammar_progress
+    ADD CONSTRAINT "user_grammar_progress_grammarId_fkey" FOREIGN KEY ("grammarId") REFERENCES public.grammar(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: user_grammar_progress user_grammar_progress_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.user_grammar_progress
+    ADD CONSTRAINT "user_grammar_progress_userId_fkey" FOREIGN KEY ("userId") REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: user_learning_paths user_learning_paths_learningPathId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.user_learning_paths
+    ADD CONSTRAINT "user_learning_paths_learningPathId_fkey" FOREIGN KEY ("learningPathId") REFERENCES public.learning_paths(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: user_learning_paths user_learning_paths_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.user_learning_paths
+    ADD CONSTRAINT "user_learning_paths_userId_fkey" FOREIGN KEY ("userId") REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: user_vocabulary_progress user_vocabulary_progress_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.user_vocabulary_progress
+    ADD CONSTRAINT "user_vocabulary_progress_userId_fkey" FOREIGN KEY ("userId") REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: user_vocabulary_progress user_vocabulary_progress_vocabularyId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.user_vocabulary_progress
+    ADD CONSTRAINT "user_vocabulary_progress_vocabularyId_fkey" FOREIGN KEY ("vocabularyId") REFERENCES public.vocabularies(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: users users_roleId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT "users_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES public.roles(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: vocabularies vocabularies_topicId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.vocabularies
+    ADD CONSTRAINT "vocabularies_topicId_fkey" FOREIGN KEY ("topicId") REFERENCES public.vocabulary_topics(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: vocabulary_examples vocabulary_examples_vocabularyId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.vocabulary_examples
+    ADD CONSTRAINT "vocabulary_examples_vocabularyId_fkey" FOREIGN KEY ("vocabularyId") REFERENCES public.vocabularies(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+\unrestrict eJzxkDGLEN8cjnwybwQt2y53XGSxTfGAiY8DCiRbued1KllbUKuIdgxJtNXbBge
+
